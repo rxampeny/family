@@ -1,0 +1,2987 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta property="og:image" content="public/escola-victor-catala.jpg">
+    <link rel="icon" href="public/escola-victor-catala.jpg" type="image/jpeg">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta property="og:image" content="https://victor-catala-1971.netlify.app/images/escola-victor-catala.jpg">
+    <meta property="og:title" content="Víctor Català 1971">
+    <meta property="og:description" content="Pàgina dedicada a l'escola Víctor Català, promoció de 1971">
+    <meta property="og:type" content="website">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://victor-catala-1971.netlify.app/victor-catala-1971.html">
+    <title>Víctor Català 1971</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.0.0/chartjs-plugin-datalabels.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 10px;
+        }
+        
+        .container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 100%;
+            width: 100%;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        h1 {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 10px 0 20px 0;
+            letter-spacing: -0.5px;
+        }
+
+        h1 img {
+            width: 35px;
+            height: 35px;
+            vertical-align: middle;
+            margin-right: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        select {
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            width: 100%;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        select:hover {
+            border-color: #667eea;
+            background-color: white;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        #chartContainer {
+            height: 60vh;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        
+        .imatge-container {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .imatge-container img {
+            max-width: 80%;
+            height: auto;
+            border-radius: 8px;
+        }
+        
+        .checkbox-container {
+            margin-bottom: 20px;
+            padding: 14px 18px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-container:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        .checkbox-container label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            user-select: none;
+            color: #495057;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            margin: 0;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+        
+        /* Estilos para el modal de contraseña */
+        #passwordModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .login-container {
+            background-color: white;
+            padding: 40px 30px;
+            border-radius: 24px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .login-container img {
+            width: 90px;
+            height: 90px;
+            margin-bottom: 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .login-container h2 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+
+        .login-container p {
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            color: #6c757d;
+        }
+
+        .login-container button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            margin-top: 15px;
+            width: 100%;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-container button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .login-container button:active {
+            transform: translateY(0);
+        }
+
+        .login-container input {
+            width: 100%;
+            padding: 14px 18px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .login-container input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        #logoutButton {
+            padding: 10px 20px;
+            margin: 10px 0;
+            background: linear-gradient(135deg, #ee5a6f 0%, #f29263 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            align-self: flex-end;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 15px rgba(238, 90, 111, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        #logoutButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(238, 90, 111, 0.6);
+        }
+
+        #logoutButton:active {
+            transform: translateY(0);
+        }
+
+        /* Botón de envío de emails */
+        .send-emails-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+            z-index: 998;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .send-emails-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .send-emails-btn:active {
+            transform: translateY(0);
+        }
+
+        .send-emails-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Botón de envío de SMS */
+        .send-sms-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 170px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+            transition: all 0.3s ease;
+            z-index: 998;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .send-sms-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .send-sms-btn:active {
+            transform: translateY(0);
+        }
+
+        .send-sms-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Botón flotante para cerrar sesión en móviles */
+        @media (max-width: 768px) {
+            #logoutButton {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 100;
+                padding: 10px 15px;
+                border-radius: 30px;
+            }
+
+            .mainContent {
+                width: 100%;
+            }
+
+            .container {
+                margin-bottom: 60px;
+                padding: 15px;
+            }
+
+            body {
+                padding: 5px;
+            }
+
+            .send-emails-btn {
+                padding: 10px 20px;
+                font-size: 0.85rem;
+                bottom: 90px;
+                left: 20px;
+            }
+
+            .send-sms-btn {
+                padding: 10px 20px;
+                font-size: 0.85rem;
+                bottom: 90px;
+                left: 150px;
+            }
+        }
+
+        /* Ocultar el contenido principal hasta que se verifique la contraseña */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(102, 126, 234, 0.2);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-container {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        /* Barra de búsqueda */
+        .search-container {
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        /* Widget de próximos cumpleaños */
+        .upcoming-widget {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 16px;
+            color: white;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+            cursor: pointer;
+        }
+
+        .upcoming-widget h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .upcoming-item {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .upcoming-item:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateX(5px);
+        }
+
+        .upcoming-item:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Estadísticas */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        /* Modal de detalles */
+        .details-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .details-modal.show {
+            display: flex;
+        }
+
+        .details-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .details-content h3 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0 0 15px 0;
+            font-size: 1.5rem;
+        }
+
+        .details-info {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .close-modal {
+            background: linear-gradient(135deg, #ee5a6f 0%, #f29263 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(238, 90, 111, 0.4);
+        }
+
+        /* Toggle modo oscuro */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 24px;
+            transition: all 0.3s ease;
+            z-index: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            border-color: #667eea;
+        }
+
+        /* Modo oscuro */
+        body.dark-mode {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        body.dark-mode .container {
+            background-color: #0f3460;
+            color: #e4e4e4;
+        }
+
+        body.dark-mode h1 {
+            -webkit-text-fill-color: #e4e4e4;
+            background: none;
+        }
+
+        body.dark-mode .search-input,
+        body.dark-mode select {
+            background-color: #1a1a2e;
+            color: #e4e4e4;
+            border-color: #2d2d44;
+        }
+
+        body.dark-mode .checkbox-container,
+        body.dark-mode .stat-card {
+            background: #1a1a2e;
+            border-color: #2d2d44;
+            color: #e4e4e4;
+        }
+
+        body.dark-mode .stat-label,
+        body.dark-mode .checkbox-container label {
+            color: #b8b8b8;
+        }
+
+        body.dark-mode .theme-toggle {
+            background: #0f3460;
+            border-color: #2d2d44;
+        }
+
+        /* Animación de transición entre meses */
+        .chart-transition {
+            animation: chartFadeIn 0.5s ease-out;
+        }
+
+        @keyframes chartFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .empty-state-text {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        /* Vista de calendario */
+        .calendar-view {
+            display: block;
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 600;
+            padding: 10px;
+            color: #667eea;
+            font-size: 0.9rem;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 8px;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .calendar-day:hover {
+            border-color: #667eea;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .calendar-day.has-birthday {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* Día actual destacado con borde dorado */
+        .calendar-day.is-today {
+            border: 3px solid #fbbf24;
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.5), 0 0 25px rgba(251, 191, 36, 0.3);
+            position: relative;
+        }
+
+        /* Cuando el día actual tiene cumpleaños, combinar ambos estilos */
+        .calendar-day.is-today.has-birthday {
+            border: 3px solid #fbbf24;
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.6), 0 0 25px rgba(251, 191, 36, 0.4);
+        }
+
+        /* Animación sutil para el día actual */
+        @keyframes pulse-today {
+            0%, 100% {
+                box-shadow: 0 0 15px rgba(251, 191, 36, 0.5), 0 0 25px rgba(251, 191, 36, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(251, 191, 36, 0.7), 0 0 35px rgba(251, 191, 36, 0.5);
+            }
+        }
+
+        .calendar-day.is-today {
+            animation: pulse-today 2s ease-in-out infinite;
+        }
+
+        .calendar-day.other-month {
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .calendar-day-number {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .calendar-birthday-count {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: white;
+            color: #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .calendar-birthday-names {
+            font-size: 0.65rem;
+            margin-top: 4px;
+            line-height: 1.2;
+        }
+
+        /* Toggle de vista */
+        .view-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            padding: 6px;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .view-toggle-btn {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: transparent;
+            color: #6c757d;
+        }
+
+        .view-toggle-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Botón flotante de agregar */
+        .add-btn {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: 3px solid white;
+            font-size: 36px;
+            cursor: pointer;
+            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+            transition: all 0.3s ease;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
+            }
+            50% {
+                transform: scale(1.08);
+                box-shadow: 0 10px 40px rgba(102, 126, 234, 0.8);
+            }
+        }
+
+        /* Animaciones para el widget de countdown */
+        @keyframes countdownPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.5);
+            }
+        }
+
+        /* Clases para activar animaciones al tocar el widget */
+        .upcoming-widget.active .glow-text {
+            animation: glow 2s ease-in-out 2;
+        }
+
+        .upcoming-widget.active .pulse-counter {
+            animation: countdownPulse 1.5s ease-in-out 3;
+        }
+
+        .add-btn:hover {
+            transform: scale(1.15) rotate(90deg);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.8);
+            animation: none;
+        }
+
+        .add-btn::before {
+            content: '➕ Afegir';
+            position: absolute;
+            right: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .add-btn:hover::before {
+            opacity: 1;
+        }
+
+        /* Modal de formulario */
+        .form-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            animation: fadeIn 0.3s ease-out;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .form-modal.show {
+            display: flex;
+        }
+
+        .form-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .form-content h3 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 0 0 20px 0;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .form-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .form-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+        }
+
+        .form-btn-secondary {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .form-btn-secondary:hover {
+            background: #dee2e6;
+        }
+
+        .form-btn-danger {
+            background: linear-gradient(135deg, #ee5a6f 0%, #f29263 100%);
+            color: white;
+        }
+
+        .form-btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(238, 90, 111, 0.5);
+        }
+
+        /* Optimización del modal para móvil */
+        @media (max-width: 768px) {
+            .form-modal {
+                padding: 10px;
+                align-items: flex-start;
+                padding-top: 20px;
+            }
+
+            .form-content {
+                max-height: 85vh;
+                padding: 20px 15px;
+                margin-bottom: 10px;
+            }
+
+            .form-content h3 {
+                font-size: 1.3rem;
+                margin-bottom: 15px;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            .form-group input,
+            .form-group select {
+                padding: 10px 12px;
+                font-size: 16px; /* Evitar zoom automático en iOS */
+            }
+
+            .form-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .form-actions .form-btn {
+                width: 100%;
+            }
+
+            /* Ajustes del widget de countdown para móvil */
+            .upcoming-widget {
+                padding: 15px;
+            }
+
+            #upcomingList {
+                font-size: 0.9rem !important;
+            }
+
+            #upcomingList > div {
+                font-size: 1rem !important;
+            }
+
+            #upcomingList strong {
+                font-size: 1.1rem !important;
+            }
+        }
+
+        /* Indicador de swipe */
+        .swipe-indicator {
+            text-align: center;
+            padding: 10px;
+            color: #6c757d;
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+
+        body.dark-mode .calendar-view,
+        body.dark-mode .form-content {
+            background: #0f3460;
+            color: #e4e4e4;
+        }
+
+        body.dark-mode .calendar-day {
+            background: #1a1a2e;
+            border-color: #2d2d44;
+            color: #e4e4e4;
+        }
+
+        body.dark-mode .view-toggle {
+            background: #1a1a2e;
+            border-color: #2d2d44;
+        }
+
+        body.dark-mode .form-group label {
+            color: #e4e4e4;
+        }
+
+        body.dark-mode .form-group input,
+        body.dark-mode .form-group select {
+            background: #1a1a2e;
+            color: #e4e4e4;
+            border-color: #2d2d44;
+        }
+
+        @media (max-width: 768px) {
+            .add-btn {
+                bottom: 80px;
+                right: 15px;
+                width: 65px;
+                height: 65px;
+                font-size: 32px;
+            }
+
+            .add-btn::before {
+                font-size: 12px;
+                padding: 6px 12px;
+                right: 75px;
+            }
+
+            .calendar-grid {
+                gap: 2px;
+            }
+
+            .calendar-day-header {
+                padding: 4px 1px;
+                font-size: 0.65rem;
+            }
+
+            .calendar-day {
+                padding: 1px;
+                font-size: 0.65rem;
+                min-height: 45px;
+            }
+
+            .calendar-day-number {
+                font-size: 0.65rem;
+            }
+
+            .calendar-birthday-count {
+                width: 14px;
+                height: 14px;
+                font-size: 0.55rem;
+                top: 1px;
+                right: 1px;
+            }
+
+            .calendar-birthday-names {
+                font-size: 0.45rem;
+                line-height: 1.0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-height: 22px;
+            }
+
+            .calendar-view {
+                padding: 5px;
+            }
+
+            .calendar-header {
+                margin-bottom: 10px;
+            }
+
+            .calendar-header h3 {
+                font-size: 1.1rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Modal de contraseña -->
+    <div id="passwordModal">
+        <div class="login-container">
+            <img src="public/escola-victor-catala.jpg" alt="Víctor Català">
+            <h2>Víctor Català 1971</h2>
+            <p>Si us plau, introdueix la contrassenya per accedir:</p>
+            <input type="password" id="passwordInput" placeholder="contrassenya">
+            <button onclick="checkPassword()">Accedir</button>
+        </div>
+    </div>
+
+    <!-- Toggle modo oscuro -->
+    <div class="theme-toggle" id="themeToggle" title="Cambiar tema">
+        🌙
+    </div>
+
+    <!-- Contenido principal (inicialmente oculto) -->
+    <div class="mainContent hidden">
+        <button id="logoutButton">Tancar sessió</button>
+        <button id="sendEmailsBtn" class="send-emails-btn" onclick="sendBirthdayEmailsManually()" title="Enviar felicitacions d'avui">
+            📧 Enviar emails
+        </button>
+        <button id="sendSmsBtn" class="send-sms-btn" onclick="sendBirthdaySMSManually()" title="Enviar SMS d'avui">
+            📱 Enviar SMS
+        </button>
+
+        <div class="container">
+            <h1><img src="public/escola-victor-catala.jpg" alt="Víctor Català">Víctor Català 1971</h1>
+            <div class="imatge-container">
+                <video id="escolaVideo" autoplay loop muted playsinline poster="public/escola-victor-catala.jpg" style="max-width: 80%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);">
+                    <source src="public/video-escola.mp4" type="video/mp4" />
+                    <img src="public/escola-victor-catala.jpg" alt="Imatge de l'escola Víctor Català" style="max-width: 80%; height: auto; border-radius: 12px;" />
+                </video>
+            </div>
+
+            <!-- Widget de próximos cumpleaños (ahora muestra countdown) -->
+            <div class="upcoming-widget" id="upcomingWidget">
+                <div id="upcomingList" style="font-size: 1rem; color: white; line-height: 1.8; font-weight: 500;"></div>
+            </div>
+
+            <!-- Estadísticas del mes -->
+            <div class="stats-container" id="statsContainer">
+                <div class="stat-card">
+                    <div class="stat-month" id="statMonth" style="font-size: 1.3rem; font-weight: 600; margin-bottom: 8px;"></div>
+                    <div class="stat-label" id="statMotivation" style="font-size: 0.9rem;"></div>
+                </div>
+                <div class="stat-card" style="max-height: 200px; overflow-y: auto;">
+                    <div class="stat-label" style="margin-bottom: 10px; font-weight: 600;">Aniversaris del mes</div>
+                    <div id="statBirthdayList" style="font-size: 0.85rem; line-height: 1.6;"></div>
+                </div>
+            </div>
+
+            <!-- Barra de búsqueda -->
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" class="search-input" placeholder="Buscar per nom...">
+            </div>
+
+            <!-- Contenedor de resultados de búsqueda -->
+            <div id="searchResults" style="display: none; margin-bottom: 20px;"></div>
+
+            <select id="mesSelector"></select>
+
+            <!-- Indicador de swipe móvil -->
+            <div class="swipe-indicator">👈 Llisca per canviar de mes 👉</div>
+
+            <!-- Vista de calendario -->
+            <div class="calendar-view" id="calendarView">
+                <div id="calendarContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón flotante de agregar -->
+    <button class="add-btn hidden" id="addBtn" onclick="openAddModal()" title="Afegir aniversari">
+        +
+    </button>
+
+    <!-- Modal de formulario -->
+    <div class="form-modal" id="formModal">
+        <div class="form-content">
+            <h3 id="formTitle">Afegir Aniversari</h3>
+            <form id="birthdayForm" onsubmit="return false;">
+                <div class="form-group">
+                    <label for="formNom">Nom *</label>
+                    <input type="text" id="formNom" required placeholder="Nom complet">
+                </div>
+                <div class="form-group">
+                    <label for="formDia">Dia *</label>
+                    <input type="number" id="formDia" min="1" max="31" required placeholder="1-31">
+                </div>
+                <div class="form-group">
+                    <label for="formMes">Mes *</label>
+                    <select id="formMes" required>
+                        <option value="">Selecciona un mes</option>
+                        <option value="1">Gener</option>
+                        <option value="2">Febrer</option>
+                        <option value="3">Març</option>
+                        <option value="4">Abril</option>
+                        <option value="5">Maig</option>
+                        <option value="6">Juny</option>
+                        <option value="7">Juliol</option>
+                        <option value="8">Agost</option>
+                        <option value="9">Setembre</option>
+                        <option value="10">Octubre</option>
+                        <option value="11">Novembre</option>
+                        <option value="12">Desembre</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="formAnyNaixement">Any de naixement</label>
+                    <input type="number" id="formAnyNaixement" min="1900" max="2025" placeholder="Ex: 1971">
+                </div>
+                <div class="form-group">
+                    <label for="formTelefon">Telèfon</label>
+                    <input type="text" id="formTelefon" placeholder="Opcional">
+                </div>
+                <div class="form-group">
+                    <label for="formEmail">Email</label>
+                    <input type="email" id="formEmail" placeholder="Opcional">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="form-btn form-btn-secondary" onclick="closeFormModal()">Cancel·lar</button>
+                    <button type="button" id="deleteBtn" class="form-btn form-btn-danger hidden" onclick="deleteBirthday()">Eliminar</button>
+                    <button type="submit" class="form-btn form-btn-primary" onclick="saveBirthday()">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de detalles -->
+    <div class="details-modal" id="detailsModal">
+        <div class="details-content">
+            <h3 id="detailsName"></h3>
+            <div class="details-info">
+                <strong>📅 Data:</strong> <span id="detailsDate"></span>
+            </div>
+            <div class="details-info" id="detailsAgeContainer" style="display: none;">
+                <strong>🎂 Edat:</strong> <span id="detailsAge"></span>
+            </div>
+            <div class="details-info">
+                <strong>📞 Telèfon:</strong> <span id="detailsPhone"></span>
+            </div>
+            <div class="details-info">
+                <strong>📧 Email:</strong> <span id="detailsEmail"></span>
+            </div>
+            <div class="details-info">
+                <strong>⏰ Dies fins al pròxim aniversari:</strong> <span id="detailsDays"></span>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="close-modal" style="flex: 1;" onclick="openEditModal()">✏️ Editar</button>
+                <button class="close-modal" style="flex: 1; background: linear-gradient(135deg, #6c757d 0%, #495057 100%);" onclick="closeDetailsModal()">Tancar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sistema de contraseña con hash SHA-256
+    
+        const correctPasswordHash = "8505c821e124e939f3342d2cd2a1d8d2694f395d217284ed4d9fcdbd11ed25f0";
+
+        // Función para generar hash SHA-256
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
+
+        // Función para verificar la contraseña
+        async function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+            const passwordHash = await hashPassword(password);
+
+            if (passwordHash === correctPasswordHash) {
+                // Generar token de sesión único
+                const sessionToken = btoa(Date.now() + Math.random().toString(36));
+                localStorage.setItem('victorCatalaAuth', sessionToken);
+                localStorage.setItem('victorCatalaAuthTime', Date.now().toString());
+                document.getElementById('passwordModal').style.display = 'none';
+                document.querySelector('.mainContent').classList.remove('hidden');
+                initializeApp();
+            } else {
+                alert('Contrassenya incorrecta. Si us plau, intenta-ho novament.');
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+
+        // Función para verificar si la sesión es válida (expira después de 24 horas)
+        function isSessionValid() {
+            const authToken = localStorage.getItem('victorCatalaAuth');
+            const authTime = localStorage.getItem('victorCatalaAuthTime');
+
+            if (!authToken || !authTime) return false;
+
+            const currentTime = Date.now();
+            const sessionAge = currentTime - parseInt(authTime);
+            const maxSessionAge = 24 * 60 * 60 * 1000; // 24 horas
+
+            return sessionAge < maxSessionAge;
+        }
+
+        // Base de datos de aniversarios (se carga dinámicamente desde Google Sheets)
+        const dadesAniversaris = [];
+
+        // Frases motivadoras para cada mes
+        const frasesMotivadores = [
+            "🎊 Any nou, nous desitjos! Comencem amb energia!", // Gener
+            "💕 Febrer, el mes de l'amor i l'amistat!", // Febrer
+            "🌸 Primavera arriba, celebrem la vida!", // Març
+            "🌧️ Abril, aigües mil... i aniversaris també!", // Abril
+            "🌺 Maig floreix, i nosaltres també!", // Maig
+            "☀️ Comença l'estiu, celebrem junts!", // Juny
+            "🎉 Juliol de vacances i alegria!", // Juliol
+            "🌞 Agost, sol i amistats que duren!", // Agost
+            "🍂 Tardor de somriures i records!", // Setembre
+            "🎃 Octubre, castanyada i celebracions!", // Octubre
+            "🍁 Novembre, temps de records i gratitud!", // Novembre
+            "🎄 Nadal arriba, celebrem amb il·lusió!" // Desembre
+        ];
+
+        // Configuración de Google Sheets API
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwMQGj6GooGyBlya6ySIFeK-5I-_EP0h15AZBrh3SaNEcIvRYDWghrYPaJeZUmiN2v7mg/exec';
+        let isSyncing = false;
+
+        // ============================================
+        // MÓDULO DE API PARA GOOGLE SHEETS
+        // ============================================
+
+        /**
+         * Cargar todos los aniversarios desde Google Sheets
+         */
+        async function fetchBirthdays() {
+            try {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL);
+                const result = await response.json();
+
+                // Verificar modo mantenimiento
+                if (result.maintenance) {
+                    showMaintenanceMode(result.message);
+                    return null;
+                }
+
+                if (result.success && result.data) {
+                    return result.data;
+                } else {
+                    console.error('Error al cargar datos:', result.error);
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error de red al cargar aniversarios:', error);
+                return null;
+            }
+        }
+
+        /**
+         * Mostrar pantalla de mantenimiento
+         */
+        function showMaintenanceMode(message) {
+            document.body.innerHTML = `
+                <div style="
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100vh;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    text-align: center;
+                    padding: 20px;
+                ">
+                    <div style="font-size: 5rem; margin-bottom: 20px;">🔧</div>
+                    <h1 style="font-size: 2.5rem; margin: 0 0 20px 0; font-weight: 600;">Manteniment</h1>
+                    <p style="font-size: 1.3rem; max-width: 600px; line-height: 1.6; opacity: 0.95;">
+                        ${message || 'En manteniment, disculpa les molèsties. En breu tornem'}
+                    </p>
+                    <button onclick="location.reload()" style="
+                        margin-top: 30px;
+                        padding: 12px 30px;
+                        font-size: 1rem;
+                        background: white;
+                        color: #667eea;
+                        border: none;
+                        border-radius: 25px;
+                        cursor: pointer;
+                        font-weight: 600;
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                        transition: transform 0.2s;
+                    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        🔄 Tornar a intentar
+                    </button>
+                </div>
+            `;
+        }
+
+        /**
+         * Añadir un nuevo aniversario a Google Sheets
+         */
+        async function addBirthdayToSheet(birthday) {
+            if (isSyncing) return { success: false, error: 'Sincronización en curso' };
+            isSyncing = true;
+
+            try {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    body: JSON.stringify({
+                        action: 'CREATE',
+                        data: birthday
+                    })
+                });
+
+                const result = await response.json();
+                isSyncing = false;
+
+                if (result.success) {
+                    console.log('Aniversario añadido a Google Sheets');
+                }
+                return result; // Retornar el resultado completo con tipo de error si existe
+            } catch (error) {
+                isSyncing = false;
+                console.error('Error de red al añadir:', error);
+                return { success: false, error: error.toString() };
+            }
+        }
+
+        /**
+         * Añadir un aniversario forzadamente (sin validación de duplicados)
+         */
+        async function addBirthdayToSheetForzado(birthday) {
+            if (isSyncing) return { success: false, error: 'Sincronización en curso' };
+            isSyncing = true;
+
+            try {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    body: JSON.stringify({
+                        action: 'CREATE_FORCE',
+                        data: birthday
+                    })
+                });
+
+                const result = await response.json();
+                isSyncing = false;
+
+                if (result.success) {
+                    console.log('Aniversario añadido forzadamente a Google Sheets');
+                }
+                return result;
+            } catch (error) {
+                isSyncing = false;
+                console.error('Error de red al añadir forzadamente:', error);
+                return { success: false, error: error.toString() };
+            }
+        }
+
+        /**
+         * Actualizar un aniversario existente en Google Sheets
+         */
+        async function updateBirthdayInSheet(oldData, newData) {
+            if (isSyncing) return false;
+            isSyncing = true;
+
+            try {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    body: JSON.stringify({
+                        action: 'UPDATE',
+                        oldData: oldData,
+                        newData: newData
+                    })
+                });
+
+                const result = await response.json();
+                isSyncing = false;
+
+                if (result.success) {
+                    console.log('Aniversario actualizado en Google Sheets');
+                    return true;
+                } else {
+                    console.error('Error al actualizar:', result.error);
+                    return false;
+                }
+            } catch (error) {
+                isSyncing = false;
+                console.error('Error de red al actualizar:', error);
+                return false;
+            }
+        }
+
+        /**
+         * Eliminar un aniversario de Google Sheets
+         */
+        async function deleteBirthdayFromSheet(birthday) {
+            if (isSyncing) return false;
+            isSyncing = true;
+
+            try {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    body: JSON.stringify({
+                        action: 'DELETE',
+                        data: birthday
+                    })
+                });
+
+                const result = await response.json();
+                isSyncing = false;
+
+                if (result.success) {
+                    console.log('Aniversario eliminado de Google Sheets');
+                    return true;
+                } else {
+                    console.error('Error al eliminar:', result.error);
+                    return false;
+                }
+            } catch (error) {
+                isSyncing = false;
+                console.error('Error de red al eliminar:', error);
+                return false;
+            }
+        }
+
+        /**
+         * Enviar emails de cumpleaños manualmente
+         */
+        async function sendBirthdayEmailsManually() {
+            // Verificar si hay cumpleaños hoy
+            const now = new Date();
+            const cumpleHoy = dadesAniversaris.filter(d =>
+                d.dia === now.getDate() && d.mes === (now.getMonth() + 1)
+            );
+
+            // Si no hay cumpleaños hoy
+            if (cumpleHoy.length === 0) {
+                alert('No hi ha aniversaris avui per enviar emails.');
+                return;
+            }
+
+            // Verificar si tienen emails
+            const sinEmail = cumpleHoy.filter(d => !d.email || d.email.trim() === '');
+            const conEmail = cumpleHoy.filter(d => d.email && d.email.trim() !== '');
+
+            if (conEmail.length === 0) {
+                alert(`Avui és l'aniversari de:\n\n${cumpleHoy.map(d => `• ${d.nom}`).join('\n')}\n\nPerò cap d'ells té email registrat.\n\nSi us plau, afegeix els emails primer.`);
+                return;
+            }
+
+            // Mostrar información de a quién se enviará
+            let mensaje = '';
+            if (conEmail.length > 0) {
+                mensaje = `S'enviaran emails a:\n\n${conEmail.map(d => `✅ ${d.nom}`).join('\n')}`;
+            }
+            if (sinEmail.length > 0) {
+                mensaje += `\n\n⚠️ Sense email (no s'enviarà):\n${sinEmail.map(d => `• ${d.nom}`).join('\n')}`;
+            }
+            mensaje += '\n\nVols continuar?';
+
+            if (!confirm(mensaje)) {
+                return;
+            }
+
+            const btn = document.getElementById('sendEmailsBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Enviant...';
+
+            try {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    body: JSON.stringify({
+                        action: 'SEND_EMAILS'
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showSyncMessage('✅ Emails enviats correctament', false);
+                } else {
+                    showSyncMessage('⚠️ Error: ' + (result.error || 'Error desconegut'), true);
+                }
+
+            } catch (error) {
+                console.error('Error al enviar emails:', error);
+                showSyncMessage('⚠️ Error de xarxa al enviar emails', true);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        /**
+         * Enviar SMS de cumpleaños manualmente
+         */
+        async function sendBirthdaySMSManually() {
+            // Verificar si hay cumpleaños hoy
+            const now = new Date();
+            const cumpleHoy = dadesAniversaris.filter(d =>
+                d.dia === now.getDate() && d.mes === (now.getMonth() + 1)
+            );
+
+            // Si no hay cumpleaños hoy
+            if (cumpleHoy.length === 0) {
+                alert('No hi ha aniversaris avui per enviar SMS.');
+                return;
+            }
+
+            // Verificar si tienen teléfono
+            const sinTelefon = cumpleHoy.filter(d => !d.telefon || d.telefon.toString().trim() === '');
+            const conTelefon = cumpleHoy.filter(d => d.telefon && d.telefon.toString().trim() !== '');
+
+            if (conTelefon.length === 0) {
+                alert(`Avui és l'aniversari de:\n\n${cumpleHoy.map(d => `• ${d.nom}`).join('\n')}\n\nPerò cap d'ells té telèfon registrat.\n\nSi us plau, afegeix els telèfons primer.`);
+                return;
+            }
+
+            // Mostrar información de a quién se enviará
+            let mensaje = '';
+            if (conTelefon.length > 0) {
+                mensaje = `S'enviaran SMS a:\n\n${conTelefon.map(d => `✅ ${d.nom} (${d.telefon})`).join('\n')}`;
+            }
+            if (sinTelefon.length > 0) {
+                mensaje += `\n\n⚠️ Sense telèfon (no s'enviarà):\n${sinTelefon.map(d => `• ${d.nom}`).join('\n')}`;
+            }
+            mensaje += '\n\nVols continuar?';
+
+            if (!confirm(mensaje)) {
+                return;
+            }
+
+            const btn = document.getElementById('sendSmsBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Enviant...';
+
+            try {
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain',
+                    },
+                    body: JSON.stringify({
+                        action: 'SEND_SMS'
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showSyncMessage('✅ SMS enviats correctament', false);
+                } else {
+                    showSyncMessage('⚠️ Error: ' + (result.error || 'Error desconegut'), true);
+                }
+
+            } catch (error) {
+                console.error('Error al enviar SMS:', error);
+                showSyncMessage('⚠️ Error de xarxa al enviar SMS', true);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        /**
+         * Mostrar mensaje de sincronización
+         */
+        function showSyncMessage(message, isError = false) {
+            const existingMsg = document.getElementById('syncMessage');
+            if (existingMsg) existingMsg.remove();
+
+            const msgDiv = document.createElement('div');
+            msgDiv.id = 'syncMessage';
+            msgDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${isError ? 'linear-gradient(135deg, #dc3545 0%, #c82333 100%)' : 'linear-gradient(135deg, #28a745 0%, #218838 100%)'};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                z-index: 10000;
+                font-size: 0.9rem;
+                animation: slideIn 0.3s ease-out;
+            `;
+            msgDiv.textContent = message;
+            document.body.appendChild(msgDiv);
+
+            setTimeout(() => {
+                msgDiv.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => msgDiv.remove(), 300);
+            }, 3000);
+        }
+
+        let chart;
+
+        function getDiesMes(mes, any = 2025) {
+            return new Date(any, mes, 0).getDate();
+        }
+
+        function getRandomColor() {
+            const r = Math.floor(Math.random() * 200 + 55);
+            const g = Math.floor(Math.random() * 200 + 55);
+            const b = Math.floor(Math.random() * 200 + 55);
+            return `rgba(${r}, ${g}, ${b}, 0.6)`;
+        }
+
+        function actualitzarGrafic(mes) {
+            // Filtrar por mes y por búsqueda
+            let aniversarisMes;
+
+            if (currentSearchTerm) {
+                aniversarisMes = searchBirthdays(currentSearchTerm).filter(d => d.mes === parseInt(mes));
+            } else {
+                aniversarisMes = dadesAniversaris.filter(d => d.mes === parseInt(mes));
+            }
+
+            aniversarisMes.sort((a, b) => a.dia - b.dia);
+
+            // Actualizar estadísticas
+            updateMonthStats(mes);
+
+            const chartContainer = document.getElementById('chartContainer');
+            const canvas = document.getElementById('aniversarisChart');
+
+            // Si no existe chartContainer, significa que no estamos en vista de gráfico
+            if (!chartContainer) {
+                console.log('No se puede actualizar gráfico: no estamos en vista de gráfico');
+                return;
+            }
+
+            // Mostrar empty state si no hay resultados
+            if (aniversarisMes.length === 0) {
+                if (chart) chart.destroy();
+                chartContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🎂</div>
+                        <div class="empty-state-text">No s'han trobat aniversaris${currentSearchTerm ? ' amb aquesta cerca' : ' aquest mes'}</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Restaurar canvas si fue eliminado
+            if (!canvas) {
+                chartContainer.innerHTML = '<canvas id="aniversarisChart"></canvas>';
+            }
+
+            // Añadir animación
+            chartContainer.classList.add('chart-transition');
+            setTimeout(() => chartContainer.classList.remove('chart-transition'), 500);
+
+            const diesMes = getDiesMes(mes);
+            const mostrarTelefons = document.getElementById('mostrarTelefons').checked;
+
+            const data = {
+                labels: aniversarisMes.map(d => {
+                    if (mostrarTelefons && d.telefon && d.telefon.trim() !== "") {
+                        return `${d.dia} - ${d.nom} (${d.telefon})`;
+                    } else {
+                        return `${d.dia} - ${d.nom}`;
+                    }
+                }),
+                datasets: [{
+                    label: 'Dia de l\'aniversari',
+                    data: aniversarisMes.map(d => d.dia),
+                    backgroundColor: aniversarisMes.map(() => getRandomColor()),
+                    borderColor: 'rgba(0, 0, 0, 0.1)',
+                    borderWidth: 1
+                }]
+            };
+
+            if (chart) {
+                chart.destroy();
+            }
+
+            const ctx = document.getElementById('aniversarisChart').getContext('2d');
+
+            // Registrar el plugin de datalabels
+            Chart.register(ChartDataLabels);
+
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (event, elements) => {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            const persona = aniversarisMes[index];
+                            showBirthdayDetails(persona);
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: diesMes,
+                            title: {
+                                display: true,
+                                text: 'Dia del mes'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                autoSkip: false,
+                                font: {
+                                    size: function(context) {
+                                        const width = window.innerWidth;
+                                        return width < 768 ? 10 : 12;
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `Aniversaris ${getPrefixForMonth(mes)}${getMesName(mes)}`,
+                            font: {
+                                size: function(context) {
+                                    const width = window.innerWidth;
+                                    return width < 768 ? 14 : 16;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            display: true,
+                            anchor: 'start',
+                            align: 'end',
+                            formatter: function(value, context) {
+                                return value;
+                            },
+                            font: {
+                                weight: 'bold',
+                                size: function(context) {
+                                    const width = window.innerWidth;
+                                    return width < 768 ? 10 : 12;
+                                }
+                            },
+                            color: 'black',
+                            offset: 4
+                        },
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Click per veure detalls';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function getMesName(mesNumber) {
+            const mesos = ["", "Gener", "Febrer", "Març", "Abril", "Maig", "Juny", "Juliol", "Agost", "Setembre", "Octubre", "Novembre", "Desembre"];
+            return mesos[parseInt(mesNumber)] || 'Mes desconegut';
+        }
+
+        function getPrefixForMonth(mesNumber) {
+            const mesos = ["", "Gener", "Febrer", "Març", "Abril", "Maig", "Juny", "Juliol", "Agost", "Setembre", "Octubre", "Novembre", "Desembre"];
+            const mesNom = mesos[parseInt(mesNumber)] || '';
+            const primeraLletra = mesNom.charAt(0).toLowerCase();
+
+            if (['a', 'e', 'i', 'o', 'u'].includes(primeraLletra)) {
+                return "d'";
+            } else {
+                return "de ";
+            }
+        }
+
+        function getFormattedToday() {
+            const hoy = new Date();
+            const dia = hoy.getDate();
+            const mesNumber = hoy.getMonth() + 1;
+            const mes = getMesName(mesNumber);
+            const any = hoy.getFullYear();
+            const prefix = getPrefixForMonth(mesNumber);
+            return `Avui és ${dia} ${prefix}${mes} de ${any}`;
+        }
+
+        function getPrefixForName(nom) {
+            const primeraLletra = nom.charAt(0).toLowerCase();
+            return ['a','e','i','o','u','à','è','é','í','ò','ó','ú'].includes(primeraLletra) ? "d'" : "de ";
+        }
+
+        function joinNamesCatalan(noms) {
+            if (noms.length === 1) return noms[0];
+            if (noms.length === 2) return `${noms[0]} i ${noms[1]}`;
+            return noms.slice(0, -1).join(", ") + " i " + noms[noms.length - 1];
+        }
+
+        function getNextBirthdays() {
+            const today = new Date();
+            const currentYear = today.getFullYear();
+
+            const proxims = dadesAniversaris.map(d => {
+                const cumple = new Date(currentYear, d.mes - 1, d.dia);
+                const fecha = (cumple < today) ? new Date(currentYear + 1, d.mes - 1, d.dia) : cumple;
+                return { nom: d.nom, dia: d.dia, mes: d.mes, fecha };
+            }).sort((a, b) => a.fecha - b.fecha);
+
+            return proxims.slice(0, 2);
+        }
+
+
+        // Función para mostrar próximo cumpleaños y recordatorio
+        function updateUpcomingBirthdays() {
+            const upcomingList = document.getElementById('upcomingList');
+            [nextBday, secondBday] = getNextBirthdays();
+
+            const now = new Date();
+            const hoyTexto = getFormattedToday();
+            const diff = nextBday ? (nextBday.fecha - now) : 0;
+
+            const cumpleHoy = dadesAniversaris.filter(d => d.dia === now.getDate() && d.mes === (now.getMonth() + 1));
+            let hoyMsg = `<div style="font-size: 0.95rem; margin-bottom: 2px; text-align: center;">📅 <strong class="glow-text">${hoyTexto}</strong></div>`;
+
+            if (cumpleHoy.length > 0) {
+                const nomsArr = cumpleHoy.map(d => d.nom);
+                const nomsFormatats = joinNamesCatalan(nomsArr);
+                hoyMsg += `<div style="font-size: 1.1rem; margin-top: 3px; text-align: center;">🎂 Avui és l'aniversari ${getPrefixForName(nomsArr[0])}<strong>${nomsFormatats}</strong></div>`;
+            }
+
+            if (!nextBday) {
+                upcomingList.innerHTML = hoyMsg;
+                return;
+            }
+
+            if (diff <= 0) {
+                // Si hay cumpleaños hoy, ya se muestra en hoyMsg, no duplicar
+                upcomingList.innerHTML = hoyMsg;
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            // Buscar persona completa para obtener anyNaixement
+            const nextPerson = dadesAniversaris.find(d => d.nom === nextBday.nom && d.dia === nextBday.dia && d.mes === nextBday.mes);
+            let ageText = '';
+            if (nextPerson && nextPerson.anyNaixement) {
+                const nextBirthdayYear = nextBday.fecha.getFullYear();
+                const age = nextBirthdayYear - nextPerson.anyNaixement;
+                ageText = `<div style="font-size: 1rem; margin-top: 2px; opacity: 0.95;">🎂 Farà <strong>${age} anys</strong></div>`;
+            }
+
+            const secondLine = "";
+
+            upcomingList.innerHTML = `
+                ${hoyMsg}
+                <div style="margin: 6px 0; text-align: center;">
+                    <div class="glow-text" style="font-size: 1.05rem; margin-bottom: 2px;">🎉 Pròxim aniversari:</div>
+                    <div style="font-size: 1.2rem; font-weight: 700; margin: 2px 0;"><strong>${nextBday.nom}</strong></div>
+                    <div style="font-size: 0.9rem; margin-top: 2px; opacity: 0.95;">${nextBday.dia} ${getMesName(nextBday.mes)}</div>
+                    ${ageText}
+                    <div class="pulse-counter" style="font-size: 1.4rem; margin-top: 5px; font-weight: 700; display: inline-block;">⏳ ${days} dies, ${hours}h ${minutes}m ${seconds}s</div>
+                </div>
+                ${secondLine}
+            `;
+        }
+
+        // Función para actualizar estadísticas del mes
+        function updateMonthStats(mes) {
+            const aniversarisMes = dadesAniversaris.filter(d => d.mes === parseInt(mes));
+
+            // Tarjeta izquierda: Mes + Frase motivadora
+            const statMonth = document.getElementById('statMonth');
+            const statMotivation = document.getElementById('statMotivation');
+
+            statMonth.textContent = getMesName(parseInt(mes));
+            statMotivation.textContent = frasesMotivadores[parseInt(mes) - 1];
+
+            // Tarjeta derecha: Lista de todos los aniversarios del mes
+            const statBirthdayList = document.getElementById('statBirthdayList');
+
+            if (aniversarisMes.length === 0) {
+                statBirthdayList.innerHTML = '<span style="color: #999;">Cap aniversari</span>';
+            } else {
+                // Ordenar por día
+                const sorted = aniversarisMes.sort((a, b) => a.dia - b.dia);
+                statBirthdayList.innerHTML = sorted.map(b =>
+                    `<div style="margin-bottom: 5px;">
+                        <strong>${b.dia}</strong> - ${b.nom}
+                    </div>`
+                ).join('');
+            }
+        }
+
+        // Variables para búsqueda y filtrado
+        let filteredData = [];
+        let currentSearchTerm = '';
+
+        // Función de búsqueda
+        function searchBirthdays(searchTerm) {
+            currentSearchTerm = searchTerm.toLowerCase();
+
+            if (!currentSearchTerm) {
+                filteredData = [];
+                return dadesAniversaris;
+            }
+
+            filteredData = dadesAniversaris.filter(d =>
+                d.nom.toLowerCase().includes(currentSearchTerm)
+            );
+
+            return filteredData;
+        }
+
+        // Función para mostrar detalles en modal
+        function showBirthdayDetails(persona) {
+            const modal = document.getElementById('detailsModal');
+            const today = new Date();
+            const currentYear = today.getFullYear();
+            const birthdayThisYear = new Date(currentYear, persona.mes - 1, persona.dia);
+            const birthdayDate = birthdayThisYear < today ?
+                new Date(currentYear + 1, persona.mes - 1, persona.dia) : birthdayThisYear;
+
+            const daysUntil = Math.floor((birthdayDate - today) / (1000 * 60 * 60 * 24));
+
+            // Guardar persona actual para edición
+            currentEditingPerson = persona;
+
+            // Restaurar display normal
+            document.getElementById('detailsDate').parentElement.innerHTML = `<strong>📅 Data:</strong> <span id="detailsDate">${persona.dia} de ${getMesName(persona.mes)}</span>`;
+
+            // Mostrar edad si existe anyNaixement
+            const ageContainer = document.getElementById('detailsAgeContainer');
+            if (persona.anyNaixement) {
+                const nextBirthdayYear = birthdayDate.getFullYear();
+                const age = nextBirthdayYear - persona.anyNaixement;
+                const currentAge = today > birthdayThisYear ? age : age - 1;
+                document.getElementById('detailsAge').textContent = `${currentAge} anys (farà ${age} anys)`;
+                ageContainer.style.display = 'block';
+            } else {
+                ageContainer.style.display = 'none';
+            }
+
+            document.getElementById('detailsPhone').parentElement.innerHTML = `<strong>📞 Telèfon:</strong> <span id="detailsPhone">${persona.telefon || 'No disponible'}</span>`;
+            document.getElementById('detailsEmail').parentElement.innerHTML = `<strong>📧 Email:</strong> <span id="detailsEmail">${persona.email || 'No disponible'}</span>`;
+            document.getElementById('detailsDays').parentElement.style.display = 'block';
+            document.getElementById('detailsDays').parentElement.innerHTML = `<strong>⏰ Dies fins al pròxim aniversari:</strong> <span id="detailsDays">${daysUntil === 0 ? 'Avui!' : daysUntil + ' dies'}</span>`;
+
+            document.getElementById('detailsName').textContent = persona.nom;
+
+            modal.classList.add('show');
+        }
+
+        function closeDetailsModal() {
+            document.getElementById('detailsModal').classList.remove('show');
+        }
+
+        // Función para toggle de modo oscuro
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+        }
+
+        // Variables para gestión de datos
+        let currentEditingIndex = -1;
+        let currentEditingPerson = null;
+        let currentView = 'chart';
+        let currentYear = new Date().getFullYear();
+
+        // Función para cargar datos desde Google Sheets (con fallback a localStorage)
+        async function loadDataFromStorage(refreshUI = false) {
+            // Mostrar indicador de carga (DESACTIVADO)
+            // const loadingDiv = document.createElement('div');
+            // loadingDiv.id = 'loadingIndicator';
+            // loadingDiv.style.cssText = `
+            //     position: fixed;
+            //     top: 50%;
+            //     left: 50%;
+            //     transform: translate(-50%, -50%);
+            //     background: rgba(0,0,0,0.8);
+            //     color: white;
+            //     padding: 20px 40px;
+            //     border-radius: 10px;
+            //     z-index: 10001;
+            //     font-size: 1rem;
+            // `;
+            // loadingDiv.innerHTML = '⏳ Carregant dades...';
+            // document.body.appendChild(loadingDiv);
+
+            try {
+                // Intentar cargar desde Google Sheets
+                const sheetData = await fetchBirthdays();
+
+                if (sheetData && sheetData.length > 0) {
+                    // Éxito: usar datos de Google Sheets
+                    dadesAniversaris.length = 0; // Limpiar array existente
+                    dadesAniversaris.push(...sheetData);
+
+                    // Guardar en localStorage como caché
+                    saveDataToStorage();
+
+                    console.log(`✅ Cargados ${sheetData.length} aniversarios desde Google Sheets`);
+                    // showSyncMessage('✅ Dades sincronitzades amb Google Sheets');
+                } else {
+                    // Fallback: usar localStorage si existe
+                    const stored = localStorage.getItem('birthdayData');
+                    if (stored) {
+                        try {
+                            const localData = JSON.parse(stored);
+                            dadesAniversaris.length = 0;
+                            dadesAniversaris.push(...localData);
+                            console.log('⚠️ Usando datos de caché local');
+                            // showSyncMessage('⚠️ Usant dades locals (sense connexió)', true);
+                        } catch (e) {
+                            console.error('Error cargando desde localStorage:', e);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error al cargar datos:', error);
+
+                // Fallback: usar localStorage
+                const stored = localStorage.getItem('birthdayData');
+                if (stored) {
+                    try {
+                        const localData = JSON.parse(stored);
+                        dadesAniversaris.length = 0;
+                        dadesAniversaris.push(...localData);
+                        // showSyncMessage('⚠️ Error de connexió. Usant dades locals', true);
+                    } catch (e) {
+                        console.error('Error cargando desde localStorage:', e);
+                    }
+                }
+            } finally {
+                // Quitar indicador de carga (DESACTIVADO)
+                // loadingDiv.remove();
+            }
+
+            // Refrescar UI si se solicita
+            if (refreshUI) {
+                console.log('🔄 loadDataFromStorage amb refreshUI=true, cridant refreshAllViews()');
+                refreshAllViews();
+            }
+        }
+
+        // Función para guardar datos en localStorage
+        function saveDataToStorage() {
+            localStorage.setItem('birthdayData', JSON.stringify(dadesAniversaris));
+        }
+
+        // Función para switch entre vistas
+        // Función para renderizar resultados de búsqueda
+        function renderSearchResults() {
+            const searchResultsContainer = document.getElementById('searchResults');
+
+            // Si no hay búsqueda, ocultar resultados
+            if (filteredData.length === 0 && !currentSearchTerm) {
+                searchResultsContainer.style.display = 'none';
+                searchResultsContainer.innerHTML = '';
+                return;
+            }
+
+            // Mostrar contenedor de resultados
+            searchResultsContainer.style.display = 'block';
+
+            if (filteredData.length === 0) {
+                searchResultsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 12px; color: #666;">
+                        <h3 style="margin: 0 0 5px 0;">😕 No s'han trobat resultats</h3>
+                        <p style="margin: 0;">Prova amb un altre nom</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `
+                <div style="padding: 15px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                    <h3 style="margin: 0 0 15px 0; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 1.1rem;">
+                        🔍 ${filteredData.length} resultat${filteredData.length !== 1 ? 's' : ''} trobat${filteredData.length !== 1 ? 's' : ''}
+                    </h3>
+                    <div style="display: grid; gap: 10px;">
+            `;
+
+            filteredData.forEach(person => {
+                const mesNom = getMesName(person.mes);
+                html += `
+                    <div onclick='showBirthdayDetails(${JSON.stringify(person).replace(/'/g, "\\'")})'
+                         style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px; border-radius: 10px; color: white; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);"
+                         onmouseover="this.style.transform='scale(1.02)'"
+                         onmouseout="this.style.transform='scale(1)'">
+                        <div style="font-weight: 600; font-size: 1rem; margin-bottom: 3px;">${person.nom}</div>
+                        <div style="opacity: 0.9; font-size: 0.85rem;">📅 ${person.dia} de ${mesNom}</div>
+                        ${person.telefon ? `<div style="opacity: 0.9; font-size: 0.85rem;">📱 ${person.telefon}</div>` : ''}
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+
+            searchResultsContainer.innerHTML = html;
+        }
+
+        // Función centralizada para refrescar todas las vistas
+        function refreshAllViews() {
+            console.log('🔄 refreshAllViews() called');
+            console.log('📊 Datos actuals:', dadesAniversaris.length, 'aniversaris');
+
+            const mesSelector = document.getElementById('mesSelector');
+            const currentMonth = parseInt(mesSelector.value);
+            console.log('📅 Mes actual:', currentMonth);
+
+            // Detectar quin tipus de vista està visible
+            const calendarView = document.getElementById('calendarView');
+            const chartContainer = document.getElementById('chartContainer');
+
+            // Refrescar vista actual basant-nos en què està visible al DOM
+            if (chartContainer && chartContainer.style.display !== 'none') {
+                console.log('📈 Refrescant gràfic...');
+                actualitzarGrafic(currentMonth);
+            } else if (calendarView) {
+                console.log('📆 Refrescant calendari...');
+                renderCalendar(currentMonth, currentYear);
+            }
+
+            // Refrescar widgets dependientes
+            updateUpcomingBirthdays();
+            updateMonthStats(currentMonth);
+
+            // Si hay búsqueda activa, actualizar resultados
+            if (currentSearchTerm) {
+                renderSearchResults();
+            }
+
+            console.log('✅ refreshAllViews() completat');
+        }
+
+        // Función para renderizar calendario
+        function renderCalendar(mes, year = currentYear) {
+            year = year || currentYear;
+            const firstDay = new Date(year, mes - 1, 1).getDay();
+            const daysInMonth = getDiesMes(mes);
+            const daysInPrevMonth = getDiesMes(mes - 1);
+
+            const dayNames = ['Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds', 'Dg'];
+            const aniversarisMes = dadesAniversaris.filter(d => d.mes === mes);
+
+            let html = `<div class="calendar-header">
+                <h3 style="margin: 0; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 1.3rem;">${getMesName(mes)} ${year}</h3>
+            </div>
+            <div class="calendar-grid">`;
+
+            // Headers
+            dayNames.forEach(day => {
+                html += `<div class="calendar-day-header">${day}</div>`;
+            });
+
+            // Días del mes anterior
+            const startDay = firstDay === 0 ? 6 : firstDay - 1;
+            for (let i = startDay - 1; i >= 0; i--) {
+                html += `<div class="calendar-day other-month">
+                    <div class="calendar-day-number">${daysInPrevMonth - i}</div>
+                </div>`;
+            }
+
+            // Días del mes actual
+            const today = new Date();
+            const todayDay = today.getDate();
+            const todayMonth = today.getMonth() + 1;
+            const todayYear = today.getFullYear();
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const birthdays = aniversarisMes.filter(d => d.dia === day);
+                const hasBirthday = birthdays.length > 0;
+                const birthdayClass = hasBirthday ? 'has-birthday' : '';
+                const isToday = (day === todayDay && mes === todayMonth && year === todayYear);
+                const todayClass = isToday ? 'is-today' : '';
+
+                html += `<div class="calendar-day ${birthdayClass} ${todayClass}" onclick="showCalendarDayDetails(${day}, ${mes})">
+                    <div class="calendar-day-number">${day}</div>`;
+
+                if (hasBirthday) {
+                    html += `<div class="calendar-birthday-count">${birthdays.length}</div>`;
+                    html += `<div class="calendar-birthday-names">`;
+                    birthdays.forEach((b, i) => {
+                        if (i < 2) {
+                            html += `${b.nom.split(' ')[0]}<br>`;
+                        }
+                    });
+                    if (birthdays.length > 2) {
+                        html += `+${birthdays.length - 2}`;
+                    }
+                    html += `</div>`;
+                }
+
+                html += `</div>`;
+            }
+
+            // Días del siguiente mes
+            const totalCells = startDay + daysInMonth;
+            const remainingCells = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+            for (let i = 1; i <= remainingCells; i++) {
+                html += `<div class="calendar-day other-month">
+                    <div class="calendar-day-number">${i}</div>
+                </div>`;
+            }
+
+            html += '</div>';
+            document.getElementById('calendarContent').innerHTML = html;
+        }
+
+        // Función para manejar la selección del desplegable
+        function selectBirthdayFromDropdown(dia, mes) {
+            const selector = document.getElementById('birthdaySelector');
+            const selectedIndex = parseInt(selector.value);
+
+            if (selectedIndex >= 0 && window.currentDayBirthdays) {
+                const selectedBirthday = window.currentDayBirthdays[selectedIndex];
+                showBirthdayDetails(selectedBirthday);
+            }
+        }
+
+        // Función para mostrar detalles de un día del calendario
+        function showCalendarDayDetails(dia, mes) {
+            const birthdays = dadesAniversaris.filter(d => d.mes === mes && d.dia === dia);
+            if (birthdays.length === 1) {
+                showBirthdayDetails(birthdays[0]);
+            } else if (birthdays.length > 1) {
+                // Mostrar selector desplegable para múltiples cumpleaños
+                const modal = document.getElementById('detailsModal');
+                document.getElementById('detailsName').textContent = `${dia} ${getMesName(mes)}`;
+                document.getElementById('detailsDate').parentElement.innerHTML = `<strong>🎂 Selecciona una persona:</strong>`;
+
+                // Crear selector desplegable
+                const selectHTML = `
+                    <select id="birthdaySelector" style="width: 100%; padding: 10px; font-size: 1rem; border: 2px solid #6366f1; border-radius: 8px; margin-top: 5px; cursor: pointer;" onchange="selectBirthdayFromDropdown(${dia}, ${mes})">
+                        <option value="">-- Tria un aniversari --</option>
+                        ${birthdays.map((b, index) =>
+                            `<option value="${index}">${b.nom}</option>`
+                        ).join('')}
+                    </select>
+                `;
+
+                document.getElementById('detailsPhone').parentElement.innerHTML = selectHTML;
+                document.getElementById('detailsDays').parentElement.style.display = 'none';
+
+                // Guardar birthdays temporalmente para acceder desde el selector
+                window.currentDayBirthdays = birthdays;
+
+                modal.classList.add('show');
+            }
+        }
+
+        // Gestión de formularios
+        function openAddModal() {
+            document.getElementById('formTitle').textContent = 'Afegir Aniversari';
+            document.getElementById('formNom').value = '';
+            document.getElementById('formDia').value = '';
+            document.getElementById('formMes').value = '';
+            document.getElementById('formAnyNaixement').value = '';
+            document.getElementById('formTelefon').value = '';
+            document.getElementById('formEmail').value = '';
+            document.getElementById('deleteBtn').classList.add('hidden');
+            currentEditingIndex = -1;
+            currentEditingPerson = null;
+            document.getElementById('formModal').classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevenir scroll del body
+        }
+
+        function openEditModal() {
+            if (!currentEditingPerson) return;
+
+            document.getElementById('formTitle').textContent = 'Editar Aniversari';
+            document.getElementById('formNom').value = currentEditingPerson.nom;
+            document.getElementById('formDia').value = currentEditingPerson.dia;
+            document.getElementById('formMes').value = currentEditingPerson.mes;
+            document.getElementById('formAnyNaixement').value = currentEditingPerson.anyNaixement || '';
+            document.getElementById('formTelefon').value = currentEditingPerson.telefon || '';
+            document.getElementById('formEmail').value = currentEditingPerson.email || '';
+            document.getElementById('deleteBtn').classList.remove('hidden');
+
+            // Encontrar índice Y preservar rowNumber para identificación precisa
+            // Si hay rowNumber, usarlo para mayor precisión; si no, usar solo nom/dia/mes
+            currentEditingIndex = dadesAniversaris.findIndex(d => {
+                if (currentEditingPerson.rowNumber && d.rowNumber) {
+                    // Si ambos tienen rowNumber, usarlo (más confiable)
+                    return d.rowNumber === currentEditingPerson.rowNumber;
+                } else {
+                    // Fallback a comparación por nom, dia, mes
+                    return d.nom === currentEditingPerson.nom &&
+                           d.dia === currentEditingPerson.dia &&
+                           d.mes === currentEditingPerson.mes;
+                }
+            });
+
+            console.log('openEditModal - currentEditingPerson:', currentEditingPerson);
+            console.log('openEditModal - currentEditingIndex:', currentEditingIndex);
+            console.log('openEditModal - dadesAniversaris[0] example:', dadesAniversaris[0]);
+
+            closeDetailsModal();
+            document.getElementById('formModal').classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevenir scroll del body
+        }
+
+        function closeFormModal() {
+            document.getElementById('formModal').classList.remove('show');
+            currentEditingIndex = -1;
+            currentEditingPerson = null;
+            document.body.style.overflow = ''; // Restaurar scroll del body
+        }
+
+        async function saveBirthday() {
+            const nom = document.getElementById('formNom').value.trim();
+            const dia = parseInt(document.getElementById('formDia').value);
+            const mes = parseInt(document.getElementById('formMes').value);
+            const anyNaixement = document.getElementById('formAnyNaixement').value ? parseInt(document.getElementById('formAnyNaixement').value) : null;
+            let telefon = document.getElementById('formTelefon').value.trim();
+            let email = document.getElementById('formEmail').value.trim();
+
+            if (!nom || !dia || !mes) {
+                alert('Si us plau, omple tots els camps obligatoris');
+                return;
+            }
+
+            if (dia < 1 || dia > 31) {
+                alert('El dia ha de ser entre 1 i 31');
+                return;
+            }
+
+            if (mes < 1 || mes > 12) {
+                alert('El mes ha de ser entre 1 (Gener) i 12 (Desembre)');
+                return;
+            }
+
+            // Validar que el día sea correcto según el mes
+            const diasPorMes = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+            const maxDia = diasPorMes[mes - 1];
+
+            if (dia > maxDia) {
+                const nombresMeses = ['Gener', 'Febrer', 'Març', 'Abril', 'Maig', 'Juny', 'Juliol', 'Agost', 'Setembre', 'Octubre', 'Novembre', 'Desembre'];
+                alert(`El mes de ${nombresMeses[mes - 1]} només té ${maxDia} dies`);
+                return;
+            }
+
+            // Validar formato de teléfono si se ha introducido
+            if (telefon) {
+                // Remover espacios, guiones y paréntesis
+                telefon = telefon.replace(/[\s\-\(\)]/g, '');
+
+                // Validar que solo contenga números y opcionalmente +
+                const telefonRegex = /^\+?[0-9]{9,15}$/;
+                if (!telefonRegex.test(telefon)) {
+                    alert('El telèfon ha de tenir entre 9 i 15 dígits i pot començar amb +\nExemple: +34666777888 o 666777888');
+                    return;
+                }
+            }
+
+            // Validar formato de email si se ha introducido
+            if (email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    alert('El format del correu electrònic no és vàlid\nExemple: nom@exemple.com');
+                    return;
+                }
+            }
+
+            const isEditing = currentEditingIndex >= 0;
+            const oldBirthday = isEditing ? { ...dadesAniversaris[currentEditingIndex] } : null; // Deep copy para preservar rowNumber
+
+            const newBirthday = { nom, dia, mes, anyNaixement, telefon, email, genere: '' };
+
+            // Si está editando, preservar rowNumber y género del dato antiguo
+            if (isEditing) {
+                if (oldBirthday.rowNumber) {
+                    newBirthday.rowNumber = oldBirthday.rowNumber;
+                }
+                if (oldBirthday.genere) {
+                    newBirthday.genere = oldBirthday.genere;
+                }
+                if (oldBirthday.anyNaixement) {
+                    newBirthday.anyNaixement = oldBirthday.anyNaixement;
+                }
+            }
+
+            // Actualizar datos localmente (inmediato)
+            if (isEditing) {
+                // Editar existente - preservar rowNumber
+                dadesAniversaris[currentEditingIndex] = newBirthday;
+            } else {
+                // Agregar nuevo - no rowNumber aún (se asignará después del sync)
+                dadesAniversaris.push(newBirthday);
+            }
+
+            saveDataToStorage();
+            closeFormModal();
+
+            // Refrescar vistas inmediatamente
+            const mesSelector = document.getElementById('mesSelector');
+            renderCalendar(parseInt(mesSelector.value), currentYear);
+            updateUpcomingBirthdays();
+            updateMonthStats(mesSelector.value);
+
+            // Sincronizar con Google Sheets en segundo plano
+            if (isEditing) {
+                // Actualizar en Google Sheets - enviar oldBirthday con rowNumber
+                const success = await updateBirthdayInSheet(oldBirthday, newBirthday);
+                if (success) {
+                    // Recargar datos para refrescar rowNumbers
+                    await loadDataFromStorage(true);
+                    showSyncMessage('✅ Canvis fets', false);
+                } else {
+                    showSyncMessage('⚠️ Error al sincronitzar. Canvis guardats localment', true);
+                }
+            } else {
+                // Añadir a Google Sheets
+                const result = await addBirthdayToSheet(newBirthday);
+
+                // Manejar diferentes tipos de error
+                if (result && result.success === false) {
+                    // Revertir cambio local
+                    dadesAniversaris.pop();
+                    saveDataToStorage();
+                    renderCalendar(parseInt(mesSelector.value), currentYear);
+                    updateUpcomingBirthdays();
+                    updateMonthStats(mesSelector.value);
+
+                    if (result.tipo === 'duplicadoExacto') {
+                        alert(result.error);
+                        return;
+                    }
+
+                    if (result.tipo === 'nombresSimilares') {
+                        const confirmar = confirm(
+                            result.error + '\n\n' +
+                            'Vols afegir igualment "' + nom + '"?'
+                        );
+
+                        if (confirmar) {
+                            // Usuario confirma: forzar creación
+                            const resultForzado = await addBirthdayToSheetForzado(newBirthday);
+
+                            if (resultForzado && resultForzado.success) {
+                                // Agregar localmente de nuevo
+                                dadesAniversaris.push(newBirthday);
+                                saveDataToStorage();
+                                renderCalendar(parseInt(mesSelector.value), currentYear);
+                                updateUpcomingBirthdays();
+                                updateMonthStats(mesSelector.value);
+                                await loadDataFromStorage(true);
+                                showSyncMessage('✅ Canvis fets', false);
+                            } else {
+                                alert('Error al afegir aniversari: ' + (resultForzado?.error || 'Error desconegut'));
+                            }
+                        }
+                        return;
+                    }
+
+                    alert(result.error || 'Error al afegir aniversari');
+                    return;
+                }
+
+                if (result && result.success) {
+                    // Recargar datos para obtener rowNumber asignado
+                    await loadDataFromStorage(true);
+                    showSyncMessage('✅ Canvis fets', false);
+                }
+            }
+        }
+
+        async function deleteBirthday() {
+            console.log('deleteBirthday called, currentEditingIndex:', currentEditingIndex);
+            console.log('currentEditingPerson:', currentEditingPerson);
+
+            if (currentEditingIndex < 0) {
+                console.error('No se puede eliminar: currentEditingIndex es', currentEditingIndex);
+                alert('Error: No se ha seleccionado ningún aniversario para eliminar');
+                return;
+            }
+
+            if (confirm('Estàs segur que vols eliminar aquest aniversari?')) {
+                // Guardar referencia completa antes de eliminar (incluye rowNumber)
+                const deletedBirthday = { ...dadesAniversaris[currentEditingIndex] };
+
+                // Eliminar localmente (inmediato)
+                dadesAniversaris.splice(currentEditingIndex, 1);
+                saveDataToStorage();
+                closeFormModal();
+
+                // Refrescar vistas inmediatamente
+                const mesSelector = document.getElementById('mesSelector');
+                if (currentView === 'chart') {
+                    actualitzarGrafic(mesSelector.value);
+                } else {
+                    renderCalendar(parseInt(mesSelector.value), currentYear);
+                }
+
+                updateUpcomingBirthdays();
+                updateMonthStats(mesSelector.value);
+
+                // Sincronizar con Google Sheets en segundo plano
+                console.log('🗑️ Eliminant de Google Sheets:', deletedBirthday.nom);
+                const success = await deleteBirthdayFromSheet(deletedBirthday);
+                console.log('📝 Resultat eliminació:', success ? 'Èxit' : 'Error');
+
+                if (success) {
+                    console.log('📥 Recarregant dades de Google Sheets...');
+                    // Recargar datos para refrescar rowNumbers después de eliminación
+                    await loadDataFromStorage(true);
+                    console.log('✅ Dades recarregades i calendari refrescat');
+                    showSyncMessage('✅ Canvis fets', false);
+                } else {
+                    showSyncMessage('⚠️ Error al sincronitzar. Canvis guardats localment', true);
+                }
+            }
+        }
+
+        // Gestos móviles (swipe)
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        function handleSwipe() {
+            const threshold = 50;
+            const diff = touchStartX - touchEndX;
+
+            if (Math.abs(diff) > threshold) {
+                const mesSelector = document.getElementById('mesSelector');
+                let currentMes = parseInt(mesSelector.value);
+
+                if (diff > 0) {
+                    // Swipe left - siguiente mes
+                    if (currentMes === 12) {
+                        currentMes = 1;
+                        currentYear++; // Incrementar año
+                    } else {
+                        currentMes++;
+                    }
+                } else {
+                    // Swipe right - mes anterior
+                    if (currentMes === 1) {
+                        currentMes = 12;
+                        currentYear--; // Decrementar año
+                    } else {
+                        currentMes--;
+                    }
+                }
+
+                mesSelector.value = currentMes;
+                renderCalendar(currentMes, currentYear);
+                updateMonthStats(currentMes);
+            }
+        }
+
+        async function initializeApp() {
+            // Cargar datos desde Google Sheets
+            await loadDataFromStorage();
+
+            const mesActual = new Date().getMonth() + 1;
+            const mesSelector = document.getElementById('mesSelector');
+            const mesos = ["Gener", "Febrer", "Març", "Abril", "Maig", "Juny", "Juliol", "Agost", "Setembre", "Octubre", "Novembre", "Desembre"];
+
+            // Limpiar opciones existentes antes de añadir nuevas
+            mesSelector.innerHTML = '';
+
+            // Llenar el selector de meses
+            mesos.forEach((mes, index) => {
+                const option = document.createElement('option');
+                option.value = index + 1;
+                option.text = mes;
+                mesSelector.appendChild(option);
+            });
+
+            mesSelector.value = mesActual;
+            renderCalendar(mesActual, currentYear);
+            updateMonthStats(mesActual);
+
+            // Añadir event listener para cambio de mes
+            mesSelector.addEventListener('change', function() {
+                renderCalendar(parseInt(this.value), currentYear);
+                updateMonthStats(this.value);
+            });
+            // Event listener para búsqueda
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value;
+                searchBirthdays(searchTerm);
+                renderSearchResults(); // Mostrar resultados en contenedor separado
+            });
+
+            // Event listener para cerrar modal al hacer click fuera
+            document.getElementById('detailsModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeDetailsModal();
+                }
+            });
+
+            // Event listener para toggle de tema
+            document.getElementById('themeToggle').addEventListener('click', toggleDarkMode);
+
+            // Inicializar modo oscuro si estaba activado
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('themeToggle').textContent = '☀️';
+            }
+
+            checkMobileSize();
+
+            // Iniciar widget de próximo cumpleaños
+            updateUpcomingBirthdays();
+            setInterval(updateUpcomingBirthdays, 1000); // Cada segundo para actualizar el contador
+
+            // Mostrar botón de agregar
+            document.getElementById('addBtn').classList.remove('hidden');
+
+            // Event listeners para swipe
+            const container = document.querySelector('.container');
+            container.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+
+            container.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
+
+            // Event listener para cerrar modal de formulario al hacer click fuera
+            document.getElementById('formModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeFormModal();
+                }
+            });
+
+            // Cargar datos al inicio si hay en localStorage
+            loadDataFromStorage();
+        }
+
+        function checkMobileSize() {
+            if (window.innerWidth <= 768) {
+                document.querySelectorAll('.imatge-container img').forEach(img => {
+                    img.style.maxWidth = '90%';
+                });
+            } else {
+                document.querySelectorAll('.imatge-container img').forEach(img => {
+                    img.style.maxWidth = '60%';
+                });
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Comprobar si ya estamos autenticados y la sesión es válida
+            if (isSessionValid()) {
+                document.getElementById('passwordModal').style.display = 'none';
+                document.querySelector('.mainContent').classList.remove('hidden');
+                initializeApp();
+            } else {
+                // Limpiar datos de autenticación expirados
+                localStorage.removeItem('victorCatalaAuth');
+                localStorage.removeItem('victorCatalaAuthTime');
+            }
+
+            // Event listener para Enter en la contraseña
+            document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkPassword();
+                }
+            });
+
+            // Event listener para cerrar sesión
+            document.getElementById('logoutButton').addEventListener('click', function() {
+                localStorage.removeItem('victorCatalaAuth');
+                localStorage.removeItem('victorCatalaAuthTime');
+                document.getElementById('passwordModal').style.display = 'flex';
+                document.querySelector('.mainContent').classList.add('hidden');
+                document.getElementById('passwordInput').value = '';
+            });
+        });
+        
+        // Ajustar tamaño al cambiar la orientación del dispositivo
+        window.addEventListener('resize', function() {
+            checkMobileSize();
+            const mesSelector = document.getElementById('mesSelector');
+            if (mesSelector && mesSelector.value) {
+                renderCalendar(parseInt(mesSelector.value), currentYear);
+            }
+        });
+
+        // Activar animaciones al tocar el widget
+        document.addEventListener('DOMContentLoaded', function() {
+            const widget = document.getElementById('upcomingWidget');
+            let animationTimeout;
+
+            if (widget) {
+                widget.addEventListener('click', function() {
+                    // Añadir clase active
+                    this.classList.add('active');
+
+                    // Limpiar timeout anterior si existe
+                    if (animationTimeout) {
+                        clearTimeout(animationTimeout);
+                    }
+
+                    // Quitar clase después de 5 segundos
+                    animationTimeout = setTimeout(() => {
+                        this.classList.remove('active');
+                    }, 5000);
+                });
+            }
+        });
+
+        // Control del video para inicio aleatorio
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.getElementById('escolaVideo');
+
+            if (video) {
+                // Cuando se carguen los metadatos del video (duración disponible)
+                video.addEventListener('loadedmetadata', function() {
+                    // Establecer posición aleatoria entre 0 y la duración del video
+                    video.currentTime = Math.random() * video.duration;
+                });
+
+                // Asegurar que el video vuelva al inicio cuando termine
+                // (el atributo loop ya debería hacer esto, pero por seguridad)
+                video.addEventListener('ended', function() {
+                    video.currentTime = 0;
+                    video.play();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
