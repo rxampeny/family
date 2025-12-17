@@ -2075,6 +2075,16 @@
                 const nomsArr = cumpleHoy.map(d => d.nom);
                 const nomsFormatats = joinNamesCatalan(nomsArr);
                 hoyMsg += `<div style="font-size: 1.1rem; margin-top: 3px; text-align: center;">🎂 Avui és l'aniversari ${getPrefixForName(nomsArr[0])}<strong>${nomsFormatats}</strong></div>`;
+
+                // Mostrar edad si está disponible
+                cumpleHoy.forEach(persona => {
+                    if (persona.anyNaixement) {
+                        const currentYear = now.getFullYear();
+                        const age = currentYear - persona.anyNaixement;
+                        const verb = cumpleHoy.length === 1 ? 'fa' : `${persona.nom.split(' ')[0]} fa`;
+                        hoyMsg += `<div style="font-size: 1rem; margin-top: 2px; text-align: center; opacity: 0.95;">🎂 ${cumpleHoy.length === 1 ? 'Fa' : verb} <strong>${age} anys</strong> avui</div>`;
+                    }
+                });
             }
 
             if (!nextBday) {
