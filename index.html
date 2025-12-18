@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="ca">
 <head>
-    <meta property="og:image" content="public/escola-victor-catala.jpg">
-    <link rel="icon" href="public/escola-victor-catala.jpg" type="image/jpeg">
+    <meta property="og:image" content="public/placeholder-familia.svg">
+    <link rel="icon" href="public/placeholder-familia.svg" type="image/svg+xml">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta property="og:image" content="https://victor-catala-1971.netlify.app/images/escola-victor-catala.jpg">
-    <meta property="og:title" content="Víctor Català 1971">
-    <meta property="og:description" content="Pàgina dedicada a l'escola Víctor Català, promoció de 1971">
+    <meta property="og:image" content="https://victor-catala-1971.netlify.app/images/placeholder-familia.svg">
+    <meta property="og:title" content="Aniversaris familiars">
+    <meta property="og:description" content="Gestió d'aniversaris familiars">
     <meta property="og:type" content="website">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:url" content="https://victor-catala-1971.netlify.app/victor-catala-1971.html">
-    <title>Víctor Català 1971</title>
+    <title>Aniversaris familiars</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -135,7 +135,7 @@
         }
         
         .imatge-container img {
-            max-width: 80%;
+            max-width: 50%;
             height: auto;
             border-radius: 8px;
         }
@@ -1233,8 +1233,8 @@
     <!-- Modal de contraseña -->
     <div id="passwordModal">
         <div class="login-container">
-            <img src="public/escola-victor-catala.jpg" alt="Víctor Català">
-            <h2>Víctor Català 1971</h2>
+            <img src="public/placeholder-familia.svg" alt="Aniversaris familiars">
+            <h2>Aniversaris familiars</h2>
             <p>Si us plau, introdueix la contrassenya per accedir:</p>
             <input type="password" id="passwordInput" placeholder="contrassenya">
             <button onclick="checkPassword()">Accedir</button>
@@ -1257,12 +1257,9 @@
         </button>
 
         <div class="container">
-            <h1><img src="public/escola-victor-catala.jpg" alt="Víctor Català">Víctor Català 1971</h1>
+            <h1><img src="public/placeholder-familia.svg" alt="Aniversaris familiars">Aniversaris familiars</h1>
             <div class="imatge-container">
-                <video id="escolaVideo" autoplay loop muted playsinline poster="public/escola-victor-catala.jpg" style="max-width: 80%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);">
-                    <source src="public/video-escola.mp4" type="video/mp4" />
-                    <img src="public/escola-victor-catala.jpg" alt="Imatge de l'escola Víctor Català" style="max-width: 80%; height: auto; border-radius: 12px;" />
-                </video>
+                <img src="public/placeholder-familia.svg" alt="Aniversaris familiars" style="max-width: 50%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);" />
             </div>
 
             <!-- Widget de próximos cumpleaños (ahora muestra countdown) -->
@@ -1350,6 +1347,21 @@
                 <div class="form-group">
                     <label for="formEmail">Email</label>
                     <input type="email" id="formEmail" placeholder="Opcional">
+                </div>
+                <div class="form-group">
+                    <label for="formGenere">Gènere</label>
+                    <select id="formGenere">
+                        <option value="">No especificat</option>
+                        <option value="H">Home</option>
+                        <option value="D">Dona</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="formViu">Estat</label>
+                    <select id="formViu">
+                        <option value="Sí">Viu</option>
+                        <option value="No">En memòria</option>
+                    </select>
                 </div>
                 <div class="form-actions">
                     <button type="button" class="form-btn form-btn-secondary" onclick="closeFormModal()">Cancel·lar</button>
@@ -2526,6 +2538,8 @@
             document.getElementById('formAnyNaixement').value = '';
             document.getElementById('formTelefon').value = '';
             document.getElementById('formEmail').value = '';
+            document.getElementById('formGenere').value = '';
+            document.getElementById('formViu').value = 'Sí';
             document.getElementById('deleteBtn').classList.add('hidden');
             currentEditingIndex = -1;
             currentEditingPerson = null;
@@ -2543,6 +2557,8 @@
             document.getElementById('formAnyNaixement').value = currentEditingPerson.anyNaixement || '';
             document.getElementById('formTelefon').value = currentEditingPerson.telefon || '';
             document.getElementById('formEmail').value = currentEditingPerson.email || '';
+            document.getElementById('formGenere').value = currentEditingPerson.genere || '';
+            document.getElementById('formViu').value = currentEditingPerson.viu || 'Sí';
             document.getElementById('deleteBtn').classList.remove('hidden');
 
             // Encontrar índice Y preservar rowNumber para identificación precisa
@@ -2582,6 +2598,8 @@
             const anyNaixement = document.getElementById('formAnyNaixement').value ? parseInt(document.getElementById('formAnyNaixement').value) : null;
             let telefon = document.getElementById('formTelefon').value.trim();
             let email = document.getElementById('formEmail').value.trim();
+            const genere = document.getElementById('formGenere').value;
+            const viu = document.getElementById('formViu').value || 'Sí';
 
             if (!nom || !dia || !mes) {
                 alert('Si us plau, omple tots els camps obligatoris');
@@ -2633,19 +2651,11 @@
             const isEditing = currentEditingIndex >= 0;
             const oldBirthday = isEditing ? { ...dadesAniversaris[currentEditingIndex] } : null; // Deep copy para preservar rowNumber
 
-            const newBirthday = { nom, dia, mes, anyNaixement, telefon, email, genere: '' };
+            const newBirthday = { nom, dia, mes, anyNaixement, telefon, email, genere, viu };
 
-            // Si está editando, preservar rowNumber y género del dato antiguo
-            if (isEditing) {
-                if (oldBirthday.rowNumber) {
-                    newBirthday.rowNumber = oldBirthday.rowNumber;
-                }
-                if (oldBirthday.genere) {
-                    newBirthday.genere = oldBirthday.genere;
-                }
-                if (oldBirthday.anyNaixement) {
-                    newBirthday.anyNaixement = oldBirthday.anyNaixement;
-                }
+            // Si está editando, preservar rowNumber del dato antiguo
+            if (isEditing && oldBirthday && oldBirthday.rowNumber) {
+                newBirthday.rowNumber = oldBirthday.rowNumber;
             }
 
             // Actualizar datos localmente (inmediato)
