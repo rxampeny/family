@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <!-- Fondo degradado -->
+  <defs>
+    <linearGradient id="gradLogin" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Fondo que rellena todo -->
+  <rect width="512" height="512" fill="url(#gradLogin)"/>
+
+  <!-- Corazón grande que rellena casi todo el espacio -->
+  <path d="M256,456 C256,456 72,332 72,196 C72,136 116,92 176,92 C216,92 246,112 256,142 C266,112 296,92 336,92 C396,92 440,136 440,196 C440,332 256,456 256,456 Z"
+        fill="#fff"
+        opacity="0.95"
+        transform="translate(0, -70) scale(1.0)"/>
+
+  <!-- Texto abajo -->
+  <text x="256" y="475" font-family="Arial, sans-serif" font-size="48" fill="#fff" text-anchor="middle" font-weight="bold">
+    Aniversaris
+  </text>
+</svg>

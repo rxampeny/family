@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="ca">
 <head>
-    <meta property="og:image" content="public/placeholder-familia.svg">
-    <link rel="icon" href="public/placeholder-familia.svg" type="image/svg+xml">
+    <meta property="og:image" content="public/icon-app.svg">
+    <link rel="icon" href="public/icon-app.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="public/icon-app.svg">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta property="og:image" content="https://victor-catala-1971.netlify.app/images/placeholder-familia.svg">
+    <meta property="og:image" content="https://victor-catala-1971.netlify.app/images/icon-app.svg">
     <meta property="og:title" content="Aniversaris familiars">
     <meta property="og:description" content="Gestió d'aniversaris familiars">
     <meta property="og:type" content="website">
@@ -1233,7 +1234,7 @@
     <!-- Modal de contraseña -->
     <div id="passwordModal">
         <div class="login-container">
-            <img src="public/placeholder-familia.svg" alt="Aniversaris familiars">
+            <img src="public/icon-login.svg" alt="Aniversaris familiars">
             <h2>Aniversaris familiars</h2>
             <p>Si us plau, introdueix la contrassenya per accedir:</p>
             <input type="password" id="passwordInput" placeholder="contrassenya">
@@ -1257,7 +1258,7 @@
         </button>
 
         <div class="container">
-            <h1><img src="public/placeholder-familia.svg" alt="Aniversaris familiars">Aniversaris familiars</h1>
+            <h1><img src="public/icon-login.svg" alt="Aniversaris familiars">Aniversaris familiars</h1>
             <div class="imatge-container">
                 <img src="public/placeholder-familia.svg" alt="Aniversaris familiars" style="max-width: 50%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);" />
             </div>
@@ -2086,15 +2087,28 @@
             if (cumpleHoy.length > 0) {
                 const nomsArr = cumpleHoy.map(d => d.nom);
                 const nomsFormatats = joinNamesCatalan(nomsArr);
-                hoyMsg += `<div style="font-size: 1.1rem; margin-top: 3px; text-align: center;">🎂 Avui és l'aniversari ${getPrefixForName(nomsArr[0])}<strong>${nomsFormatats}</strong></div>`;
 
-                // Mostrar edad si está disponible
+                // Determinar si todas las personas están fallecidas
+                const todasFallecidas = cumpleHoy.every(p => p.viu === 'No');
+                const texto = todasFallecidas ? 'Avui va néixer' : `Avui és l'aniversari ${getPrefixForName(nomsArr[0])}`;
+
+                hoyMsg += `<div style="font-size: 1.1rem; margin-top: 3px; text-align: center;">${todasFallecidas ? '🕊️' : '🎂'} ${texto}<strong>${nomsFormatats}</strong></div>`;
+
+                // Mostrar edad o año de nacimiento
                 cumpleHoy.forEach(persona => {
                     if (persona.anyNaixement) {
                         const currentYear = now.getFullYear();
                         const age = currentYear - persona.anyNaixement;
-                        const verb = cumpleHoy.length === 1 ? 'fa' : `${persona.nom.split(' ')[0]} fa`;
-                        hoyMsg += `<div style="font-size: 1rem; margin-top: 2px; text-align: center; opacity: 0.95;">🎂 ${cumpleHoy.length === 1 ? 'Fa' : verb} <strong>${age} anys</strong> avui</div>`;
+
+                        // Si la persona NO está viva, mostrar año de nacimiento
+                        if (persona.viu === 'No') {
+                            const nascut = persona.genere === 'D' ? 'Nascuda' : 'Nascut';
+                            hoyMsg += `<div style="font-size: 1rem; margin-top: 2px; text-align: center; opacity: 0.95;">🕊️ ${nascut} el <strong>${persona.anyNaixement}</strong></div>`;
+                        } else {
+                            // Si está viva, mostrar edad
+                            const verb = cumpleHoy.length === 1 ? 'fa' : `${persona.nom.split(' ')[0]} fa`;
+                            hoyMsg += `<div style="font-size: 1rem; margin-top: 2px; text-align: center; opacity: 0.95;">🎂 ${cumpleHoy.length === 1 ? 'Fa' : verb} <strong>${age} anys</strong> avui</div>`;
+                        }
                     }
                 });
             }
@@ -2115,13 +2129,20 @@
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-            // Buscar persona completa para obtener anyNaixement
+            // Buscar persona completa para obtener anyNaixement y estado
             const nextPerson = dadesAniversaris.find(d => d.nom === nextBday.nom && d.dia === nextBday.dia && d.mes === nextBday.mes);
             let ageText = '';
             if (nextPerson && nextPerson.anyNaixement) {
                 const nextBirthdayYear = nextBday.fecha.getFullYear();
                 const age = nextBirthdayYear - nextPerson.anyNaixement;
-                ageText = `<div style="font-size: 1rem; margin-top: 2px; opacity: 0.95;">🎂 Farà <strong>${age} anys</strong></div>`;
+
+                // Si la persona NO está viva, mostrar año de nacimiento
+                if (nextPerson.viu === 'No') {
+                    const nascut = nextPerson.genere === 'D' ? 'Nascuda' : 'Nascut';
+                    ageText = `<div style="font-size: 1rem; margin-top: 2px; opacity: 0.95;">🕊️ ${nascut} el <strong>${nextPerson.anyNaixement}</strong></div>`;
+                } else {
+                    ageText = `<div style="font-size: 1rem; margin-top: 2px; opacity: 0.95;">🎂 Farà <strong>${age} anys</strong></div>`;
+                }
             }
 
             const secondLine = "";
