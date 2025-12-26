@@ -2175,6 +2175,14 @@
         }
 
 
+        // Función auxiliar para calcular el año correcto según el mes seleccionado
+        function getYearForMonth(selectedMonth) {
+            const today = new Date();
+            const currentMonth = today.getMonth() + 1;
+            // Si el mes seleccionado ya pasó, mostrar el año siguiente
+            return selectedMonth < currentMonth ? currentYear + 1 : currentYear;
+        }
+
         // Función para mostrar próximo cumpleaños y recordatorio
         function updateUpcomingBirthdays() {
             const upcomingList = document.getElementById('upcomingList');
@@ -2823,7 +2831,8 @@
 
             // Refrescar vistas inmediatamente
             const mesSelector = document.getElementById('mesSelector');
-            renderCalendar(parseInt(mesSelector.value), currentYear);
+            const selectedMonth = parseInt(mesSelector.value);
+            renderCalendar(selectedMonth, getYearForMonth(selectedMonth));
             updateUpcomingBirthdays();
             updateMonthStats(mesSelector.value);
 
@@ -2847,7 +2856,8 @@
                     // Revertir cambio local
                     dadesAniversaris.pop();
                     saveDataToStorage();
-                    renderCalendar(parseInt(mesSelector.value), currentYear);
+                    const selectedMonth2 = parseInt(mesSelector.value);
+                    renderCalendar(selectedMonth2, getYearForMonth(selectedMonth2));
                     updateUpcomingBirthdays();
                     updateMonthStats(mesSelector.value);
 
@@ -2870,7 +2880,8 @@
                                 // Agregar localmente de nuevo
                                 dadesAniversaris.push(newBirthday);
                                 saveDataToStorage();
-                                renderCalendar(parseInt(mesSelector.value), currentYear);
+                                const selectedMonth3 = parseInt(mesSelector.value);
+                                renderCalendar(selectedMonth3, getYearForMonth(selectedMonth3));
                                 updateUpcomingBirthdays();
                                 updateMonthStats(mesSelector.value);
                                 await loadDataFromStorage(true);
@@ -2949,7 +2960,8 @@
                 if (currentView === 'chart') {
                     actualitzarGrafic(mesSelector.value);
                 } else {
-                    renderCalendar(parseInt(mesSelector.value), currentYear);
+                    const selectedMonth4 = parseInt(mesSelector.value);
+                    renderCalendar(selectedMonth4, getYearForMonth(selectedMonth4));
                 }
 
                 updateUpcomingBirthdays();
@@ -3033,7 +3045,8 @@
 
             // Añadir event listener para cambio de mes
             mesSelector.addEventListener('change', function() {
-                renderCalendar(parseInt(this.value), currentYear);
+                const selectedMonth = parseInt(this.value);
+                renderCalendar(selectedMonth, getYearForMonth(selectedMonth));
                 updateMonthStats(this.value);
             });
             // Event listener para búsqueda
