@@ -606,6 +606,90 @@
             box-shadow: 0 4px 12px rgba(238, 90, 111, 0.4);
         }
 
+        /* Modal de confirmación */
+        .confirm-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .confirm-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease-out;
+            text-align: center;
+        }
+
+        .confirm-content h3 {
+            color: #d32f2f;
+            margin: 0 0 15px 0;
+            font-size: 1.5rem;
+        }
+
+        .confirm-content p {
+            color: #666;
+            margin: 10px 0;
+        }
+
+        .confirm-content ul {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+
+        .confirm-content ul li {
+            background: #ffebee;
+            padding: 8px 15px;
+            margin: 5px 0;
+            border-radius: 8px;
+            color: #c62828;
+            font-weight: 500;
+        }
+
+        .confirm-btn {
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 1;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .confirm-btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .confirm-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .confirm-btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+        }
+
+        .confirm-btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+        }
+
         /* Toggle modo oscuro */
         .theme-toggle {
             position: fixed;
@@ -1338,19 +1422,19 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="formAnyNaixement">Any de naixement</label>
+                    <label for="formAnyNaixement">Any de naixement *</label>
                     <input type="number" id="formAnyNaixement" min="1900" max="2025" placeholder="Ex: 1971">
                 </div>
                 <div class="form-group">
-                    <label for="formTelefon">Telèfon</label>
-                    <input type="text" id="formTelefon" placeholder="Opcional">
+                    <label for="formTelefon">Telèfon *</label>
+                    <input type="text" id="formTelefon" placeholder="Número de telèfon">
                 </div>
                 <div class="form-group">
-                    <label for="formEmail">Email</label>
-                    <input type="email" id="formEmail" placeholder="Opcional">
+                    <label for="formEmail">Email *</label>
+                    <input type="email" id="formEmail" placeholder="correu@example.com">
                 </div>
                 <div class="form-group">
-                    <label for="formGenere">Gènere</label>
+                    <label for="formGenere">Gènere *</label>
                     <select id="formGenere">
                         <option value="">No especificat</option>
                         <option value="H">Home</option>
@@ -1358,8 +1442,9 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="formViu">Estat</label>
+                    <label for="formViu">Estat *</label>
                     <select id="formViu">
+                        <option value="">No especificat</option>
                         <option value="Sí">Viu</option>
                         <option value="No">En memòria</option>
                     </select>
@@ -1395,6 +1480,20 @@
             <div style="display: flex; gap: 10px; margin-top: 15px;">
                 <button class="close-modal" style="flex: 1;" onclick="openEditModal()">✏️ Editar</button>
                 <button class="close-modal" style="flex: 1; background: linear-gradient(135deg, #6c757d 0%, #495057 100%);" onclick="closeDetailsModal()">Tancar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación para campos incompletos -->
+    <div class="confirm-modal" id="confirmModal" style="display: none;">
+        <div class="confirm-content">
+            <h3>⚠️ Camps incomplets</h3>
+            <p>Falten els següents camps per emplenar:</p>
+            <ul id="missingFieldsList" style="text-align: left; margin: 15px 0; color: #d32f2f;"></ul>
+            <p style="margin-top: 15px;">Vols completar-los ara o guardar igualment?</p>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="confirm-btn confirm-btn-secondary" onclick="closeConfirmModal()">Completar ara</button>
+                <button class="confirm-btn confirm-btn-primary" onclick="saveAnywayConfirmed()">Guardar igualment</button>
             </div>
         </div>
     </div>
@@ -2560,7 +2659,7 @@
             document.getElementById('formTelefon').value = '';
             document.getElementById('formEmail').value = '';
             document.getElementById('formGenere').value = '';
-            document.getElementById('formViu').value = 'Sí';
+            document.getElementById('formViu').value = '';
             document.getElementById('deleteBtn').classList.add('hidden');
             currentEditingIndex = -1;
             currentEditingPerson = null;
@@ -2579,7 +2678,7 @@
             document.getElementById('formTelefon').value = currentEditingPerson.telefon || '';
             document.getElementById('formEmail').value = currentEditingPerson.email || '';
             document.getElementById('formGenere').value = currentEditingPerson.genere || '';
-            document.getElementById('formViu').value = currentEditingPerson.viu || 'Sí';
+            document.getElementById('formViu').value = currentEditingPerson.viu || '';
             document.getElementById('deleteBtn').classList.remove('hidden');
 
             // Encontrar índice Y preservar rowNumber para identificación precisa
@@ -2620,13 +2719,40 @@
             let telefon = document.getElementById('formTelefon').value.trim();
             let email = document.getElementById('formEmail').value.trim();
             const genere = document.getElementById('formGenere').value;
-            const viu = document.getElementById('formViu').value || 'Sí';
+            const viu = document.getElementById('formViu').value;
 
-            if (!nom || !dia || !mes) {
-                alert('Si us plau, omple tots els camps obligatoris');
+            // Validar campos obligatorios y mostrar modal si falta alguno
+            const missingFields = [];
+            if (!nom) missingFields.push('Nom');
+            if (!dia) missingFields.push('Dia');
+            if (!mes) missingFields.push('Mes');
+            if (!anyNaixement) missingFields.push('Any de naixement');
+            if (!telefon) missingFields.push('Telèfon');
+            if (!email) missingFields.push('Email');
+            if (!genere) missingFields.push('Gènere');
+            if (!viu) missingFields.push('Estat');
+
+            if (missingFields.length > 0) {
+                showConfirmModal(missingFields);
                 return;
             }
 
+            // Continuar con el guardado normal
+            await saveBirthdayConfirmed();
+        }
+
+        // Función que realmente guarda el cumpleaños (se llama después de validar o confirmar)
+        async function saveBirthdayConfirmed() {
+            const nom = document.getElementById('formNom').value.trim();
+            const dia = parseInt(document.getElementById('formDia').value);
+            const mes = parseInt(document.getElementById('formMes').value);
+            const anyNaixement = document.getElementById('formAnyNaixement').value ? parseInt(document.getElementById('formAnyNaixement').value) : null;
+            let telefon = document.getElementById('formTelefon').value.trim();
+            let email = document.getElementById('formEmail').value.trim();
+            const genere = document.getElementById('formGenere').value;
+            const viu = document.getElementById('formViu').value;
+
+            // Validaciones básicas de formato
             if (dia < 1 || dia > 31) {
                 alert('El dia ha de ser entre 1 i 31');
                 return;
@@ -2762,6 +2888,37 @@
                     showSyncMessage('✅ Canvis fets', false);
                 }
             }
+        }
+
+        // Funciones para manejar el modal de confirmación de campos incompletos
+        function showConfirmModal(missingFields) {
+            const modal = document.getElementById('confirmModal');
+            const list = document.getElementById('missingFieldsList');
+
+            // Limpiar lista anterior
+            list.innerHTML = '';
+
+            // Agregar campos faltantes a la lista
+            missingFields.forEach(field => {
+                const li = document.createElement('li');
+                li.textContent = field;
+                list.appendChild(li);
+            });
+
+            // Mostrar modal
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeConfirmModal() {
+            const modal = document.getElementById('confirmModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        async function saveAnywayConfirmed() {
+            closeConfirmModal();
+            await saveBirthdayConfirmed();
         }
 
         async function deleteBirthday() {
