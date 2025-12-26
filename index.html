@@ -19,6 +19,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.0.0/chartjs-plugin-datalabels.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -787,6 +788,252 @@
             font-weight: 500;
         }
 
+        /* Modal de árbol genealógico */
+        .family-tree-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            overflow: hidden;
+        }
+
+        .family-tree-modal.show {
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .family-tree-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .family-tree-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .family-tree-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .family-tree-close:hover {
+            background: white;
+            color: #667eea;
+            transform: rotate(90deg);
+        }
+
+        .family-tree-container {
+            flex: 1;
+            position: relative;
+            background: #fafafa;
+            overflow: hidden;
+        }
+
+        #familyTreeSVG {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Controles de zoom del árbol */
+        .tree-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .tree-control-btn {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            font-size: 1.3rem;
+            color: #667eea;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            font-weight: 600;
+        }
+
+        .tree-control-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        /* Estilos de nodos del árbol D3 */
+        .tree-node {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tree-node:hover {
+            transform: scale(1.05);
+        }
+
+        .tree-node-circle {
+            fill: #667eea;
+            stroke: #764ba2;
+            stroke-width: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .tree-node-circle.deceased {
+            fill: #9ca3af;
+            stroke: #6b7280;
+        }
+
+        .tree-node-circle.female {
+            fill: #ec4899;
+            stroke: #db2777;
+        }
+
+        .tree-node:hover .tree-node-circle {
+            stroke-width: 5px;
+            filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.6));
+        }
+
+        .tree-node-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            fill: #333;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+
+        .tree-node-initials {
+            font-family: 'Inter', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            fill: white;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            pointer-events: none;
+        }
+
+        .tree-node-subtext {
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 400;
+            fill: #6c757d;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+
+        .tree-link {
+            fill: none;
+            stroke: #cbd5e0;
+            stroke-width: 2px;
+        }
+
+        .tree-link-partner {
+            stroke: #f687b3;
+            stroke-width: 3px;
+            stroke-dasharray: 5, 5;
+        }
+
+        /* Leyenda */
+        .family-tree-legend {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            gap: 20px;
+            font-size: 0.9rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .family-tree-header h2 {
+                font-size: 1.2rem;
+            }
+
+            .tree-controls {
+                top: 10px;
+                right: 10px;
+                gap: 5px;
+            }
+
+            .tree-control-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1rem;
+            }
+
+            .family-tree-legend {
+                flex-direction: column;
+                gap: 10px;
+                font-size: 0.85rem;
+                padding: 12px 20px;
+            }
+        }
+
+        /* Modo oscuro para modal de árbol */
+        body.dark-mode .family-tree-container {
+            background: #16213e;
+        }
+
+        body.dark-mode .tree-node-text {
+            fill: #e4e4e4;
+        }
+
+        body.dark-mode .tree-control-btn {
+            background: #0f3460;
+            color: #e4e4e4;
+            border-color: #e4e4e4;
+        }
+
+        body.dark-mode .tree-control-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        body.dark-mode .family-tree-legend {
+            background: #0f3460;
+            color: #e4e4e4;
+        }
+
         /* Vista de calendario */
         .calendar-view {
             display: block;
@@ -1036,6 +1283,80 @@
 
         .add-btn:hover::before {
             opacity: 1;
+        }
+
+        /* Botón flotante de árbol genealógico */
+        .tree-btn {
+            position: fixed;
+            bottom: 90px;
+            left: 20px;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 36px;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.5);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: floatTree 3s ease-in-out infinite;
+        }
+
+        @keyframes floatTree {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .tree-btn:hover {
+            transform: scale(1.15);
+            box-shadow: 0 12px 40px rgba(16, 185, 129, 0.8);
+            animation: none;
+        }
+
+        .tree-btn::before {
+            content: '🌳 Arbre';
+            position: absolute;
+            left: 80px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            white-space: nowrap;
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .tree-btn:hover::before {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .tree-btn {
+                bottom: 80px;
+                left: 15px;
+                width: 65px;
+                height: 65px;
+                font-size: 32px;
+            }
+
+            .tree-btn::before {
+                font-size: 12px;
+                padding: 6px 12px;
+                left: 75px;
+            }
         }
 
         /* Modal de formulario */
@@ -1390,6 +1711,11 @@
         +
     </button>
 
+    <!-- Botón flotante de árbol genealógico -->
+    <button class="tree-btn hidden" id="treeBtn" onclick="openFamilyTree()" title="Veure arbre familiar">
+        🌳
+    </button>
+
     <!-- Modal de formulario -->
     <div class="form-modal" id="formModal">
         <div class="form-content">
@@ -1449,6 +1775,43 @@
                         <option value="No">En memòria</option>
                     </select>
                 </div>
+
+                <!-- Sección de relaciones familiares -->
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #e0e0e0;">
+                    <div style="font-weight: 600; color: #667eea; margin-bottom: 15px; font-size: 1.05rem;">
+                        👨‍👩‍👧‍👦 Relacions familiars (opcional)
+                    </div>
+
+                    <div class="form-group">
+                        <label for="formPare">Pare</label>
+                        <select id="formPare">
+                            <option value="">No especificat</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="formMare">Mare</label>
+                        <select id="formMare">
+                            <option value="">No especificat</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="formParella">Parella</label>
+                        <select id="formParella">
+                            <option value="">No especificat</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="formUrlFoto">Foto (URL)</label>
+                        <input type="url" id="formUrlFoto" placeholder="https://exemple.com/foto.jpg">
+                        <small style="color: #6c757d; font-size: 0.85rem; display: block; margin-top: 5px;">
+                            Opcional: enllaç a una imatge
+                        </small>
+                    </div>
+                </div>
+
                 <div class="form-actions">
                     <button type="button" class="form-btn form-btn-secondary" onclick="closeFormModal()">Cancel·lar</button>
                     <button type="button" id="deleteBtn" class="form-btn form-btn-danger hidden" onclick="deleteBirthday()">Eliminar</button>
@@ -1494,6 +1857,30 @@
             <div style="display: flex; gap: 10px; margin-top: 20px;">
                 <button class="confirm-btn confirm-btn-secondary" onclick="closeConfirmModal()">Completar ara</button>
                 <button class="confirm-btn confirm-btn-primary" onclick="saveAnywayConfirmed()">Guardar igualment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de árbol genealógico -->
+    <div class="family-tree-modal" id="familyTreeModal">
+        <div class="family-tree-header">
+            <h2>🌳 Arbre Genealògic Familiar</h2>
+            <button class="family-tree-close" onclick="closeFamilyTree()" title="Tancar (ESC)">
+                ✕
+            </button>
+        </div>
+        <div class="family-tree-container" id="familyTreeContainer">
+            <!-- El árbol se renderizará aquí con D3.js -->
+            <div class="tree-controls">
+                <button class="tree-control-btn" onclick="zoomInTree()" title="Ampliar">+</button>
+                <button class="tree-control-btn" onclick="zoomOutTree()" title="Reduir">−</button>
+                <button class="tree-control-btn" onclick="resetZoomTree()" title="Reiniciar vista">⟲</button>
+            </div>
+            <div class="family-tree-legend">
+                <div class="legend-item">🔵 Home</div>
+                <div class="legend-item">🔴 Dona</div>
+                <div class="legend-item">🕊️ En memòria</div>
+                <div class="legend-item">💕 Parella</div>
             </div>
         </div>
     </div>
@@ -2354,6 +2741,29 @@
 
             document.getElementById('detailsName').textContent = persona.nom;
 
+            // Mostrar información de relaciones familiares
+            const familyInfoHtml = buildFamilyInfoHtml(persona);
+            const detailsContent = document.querySelector('.details-content');
+            let existingFamilyInfo = document.getElementById('familyRelationsInfo');
+
+            if (existingFamilyInfo) {
+                existingFamilyInfo.remove();
+            }
+
+            if (familyInfoHtml) {
+                const familyDiv = document.createElement('div');
+                familyDiv.id = 'familyRelationsInfo';
+                familyDiv.style.cssText = 'margin-top: 15px; padding-top: 15px; border-top: 2px solid #e0e0e0;';
+                familyDiv.innerHTML = familyInfoHtml;
+
+                const buttonsContainer = detailsContent.querySelector('.details-buttons');
+                if (buttonsContainer) {
+                    detailsContent.insertBefore(familyDiv, buttonsContainer);
+                } else {
+                    detailsContent.appendChild(familyDiv);
+                }
+            }
+
             modal.classList.add('show');
         }
 
@@ -2368,6 +2778,401 @@
             document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
             localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
         }
+
+        // ============================================
+        // MÓDULO DE ÁRBOL GENEALÓGICO
+        // ============================================
+
+        // Variables globales para D3.js
+        let familyTreeSvg, familyTreeG, familyTreeZoom;
+
+        /**
+         * Abrir modal del árbol genealógico
+         */
+        function openFamilyTree() {
+            const modal = document.getElementById('familyTreeModal');
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+
+            // Renderizar árbol después de un breve delay para que el modal se abra
+            setTimeout(() => {
+                renderFamilyTree();
+            }, 100);
+        }
+
+        /**
+         * Cerrar modal del árbol genealógico
+         */
+        function closeFamilyTree() {
+            const modal = document.getElementById('familyTreeModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        /**
+         * Poblar dropdowns de relaciones familiares
+         */
+        function populateFamilyDropdowns(excludeRowNumber = null) {
+            const pareSelect = document.getElementById('formPare');
+            const mareSelect = document.getElementById('formMare');
+            const parellaSelect = document.getElementById('formParella');
+
+            // Limpiar opciones existentes
+            pareSelect.innerHTML = '<option value="">No especificat</option>';
+            mareSelect.innerHTML = '<option value="">No especificat</option>';
+            parellaSelect.innerHTML = '<option value="">No especificat</option>';
+
+            // Filtrar todas las personas (incluyendo fallecidas) y ordenar por nombre
+            const allPeople = dadesAniversaris
+                .filter(p => p.rowNumber !== excludeRowNumber)
+                .sort((a, b) => a.nom.localeCompare(b.nom, 'ca'));
+
+            // Poblar Pare (solo hombres)
+            allPeople.filter(p => p.genere === 'H').forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.rowNumber;
+                const age = p.anyNaixement ? ` (${new Date().getFullYear() - p.anyNaixement} anys)` : '';
+                const deceased = p.viu === 'No' ? ' 🕊️' : '';
+                option.textContent = `${p.nom}${age}${deceased}`;
+                pareSelect.appendChild(option);
+            });
+
+            // Poblar Mare (solo mujeres)
+            allPeople.filter(p => p.genere === 'D').forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.rowNumber;
+                const age = p.anyNaixement ? ` (${new Date().getFullYear() - p.anyNaixement} anys)` : '';
+                const deceased = p.viu === 'No' ? ' 🕊️' : '';
+                option.textContent = `${p.nom}${age}${deceased}`;
+                mareSelect.appendChild(option);
+            });
+
+            // Poblar Parella (todos)
+            allPeople.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.rowNumber;
+                const icon = p.genere === 'H' ? '👨' : p.genere === 'D' ? '👩' : '';
+                const age = p.anyNaixement ? ` (${new Date().getFullYear() - p.anyNaixement} anys)` : '';
+                const deceased = p.viu === 'No' ? ' 🕊️' : '';
+                option.textContent = `${icon} ${p.nom}${age}${deceased}`;
+                parellaSelect.appendChild(option);
+            });
+        }
+
+        /**
+         * Construir estructura jerárquica para D3.js
+         */
+        function buildFamilyHierarchy() {
+            // Crear mapa de personas por rowNumber
+            const peopleMap = new Map();
+            dadesAniversaris.forEach(person => {
+                peopleMap.set(person.rowNumber, {
+                    ...person,
+                    children: []
+                });
+            });
+
+            const roots = [];
+
+            // Identificar raíces y construir jerarquía
+            dadesAniversaris.forEach(person => {
+                const hasPare = person.pareId && peopleMap.has(person.pareId);
+                const hasMare = person.mareId && peopleMap.has(person.mareId);
+
+                if (!hasPare && !hasMare) {
+                    // Es una raíz
+                    roots.push(peopleMap.get(person.rowNumber));
+                } else {
+                    // Agregar como hijo del padre (priorizamos padre sobre madre para evitar duplicados)
+                    if (hasPare) {
+                        peopleMap.get(person.pareId).children.push(peopleMap.get(person.rowNumber));
+                    } else if (hasMare) {
+                        peopleMap.get(person.mareId).children.push(peopleMap.get(person.rowNumber));
+                    }
+                }
+            });
+
+            // Si no hay raíces, crear nodo virtual
+            if (roots.length === 0 && dadesAniversaris.length > 0) {
+                return {
+                    nom: 'Família',
+                    virtual: true,
+                    children: Array.from(peopleMap.values())
+                };
+            }
+
+            // Si hay una sola raíz, retornarla
+            if (roots.length === 1) {
+                return roots[0];
+            }
+
+            // Si hay múltiples raíces, crear nodo virtual
+            return {
+                nom: 'Família',
+                virtual: true,
+                children: roots
+            };
+        }
+
+        /**
+         * Obtener iniciales de un nombre
+         */
+        function getInitials(name) {
+            if (!name) return '??';
+            const parts = name.trim().split(' ');
+            if (parts.length === 1) {
+                return parts[0].substring(0, 2).toUpperCase();
+            }
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        }
+
+        /**
+         * Renderizar árbol genealógico con D3.js
+         */
+        function renderFamilyTree() {
+            const container = document.getElementById('familyTreeContainer');
+
+            // Limpiar SVG anterior (pero mantener controles y leyenda)
+            const existingSvg = container.querySelector('svg');
+            if (existingSvg) {
+                existingSvg.remove();
+            }
+
+            // Si no hay datos, mostrar mensaje
+            if (dadesAniversaris.length === 0) {
+                const message = document.createElement('div');
+                message.style.cssText = `
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    text-align: center;
+                    color: #6c757d;
+                    font-size: 1.2rem;
+                `;
+                message.innerHTML = `
+                    <div style="font-size: 4rem; margin-bottom: 20px;">🌳</div>
+                    <div>No hi ha dades per mostrar l'arbre familiar</div>
+                `;
+                container.insertBefore(message, container.firstChild);
+                return;
+            }
+
+            // Dimensiones
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // Crear SVG
+            familyTreeSvg = d3.select('#familyTreeContainer')
+                .insert('svg', ':first-child')
+                .attr('width', width)
+                .attr('height', height);
+
+            // Configurar zoom
+            familyTreeZoom = d3.zoom()
+                .scaleExtent([0.1, 3])
+                .on('zoom', (event) => {
+                    familyTreeG.attr('transform', event.transform);
+                });
+
+            familyTreeSvg.call(familyTreeZoom);
+
+            // Grupo principal
+            familyTreeG = familyTreeSvg.append('g');
+
+            // Construir jerarquía
+            const hierarchyData = buildFamilyHierarchy();
+            const root = d3.hierarchy(hierarchyData);
+
+            // Configurar layout de árbol
+            const treeLayout = d3.tree()
+                .size([height - 150, width - 300])
+                .separation((a, b) => (a.parent === b.parent ? 1 : 1.2));
+
+            // Calcular posiciones
+            treeLayout(root);
+
+            // Renderizar enlaces (líneas entre nodos)
+            familyTreeG.selectAll('.tree-link')
+                .data(root.links())
+                .enter()
+                .append('path')
+                .attr('class', 'tree-link')
+                .attr('d', d3.linkHorizontal()
+                    .x(d => d.y + 150)
+                    .y(d => d.x + 75)
+                );
+
+            // Renderizar nodos
+            const nodes = familyTreeG.selectAll('.tree-node')
+                .data(root.descendants())
+                .enter()
+                .append('g')
+                .attr('class', 'tree-node')
+                .attr('transform', d => `translate(${d.y + 150}, ${d.x + 75})`)
+                .on('click', (event, d) => {
+                    if (!d.data.virtual) {
+                        showBirthdayDetails(d.data);
+                    }
+                });
+
+            // Círculos de nodos
+            nodes.append('circle')
+                .attr('class', d => {
+                    let classes = 'tree-node-circle';
+                    if (d.data.viu === 'No') classes += ' deceased';
+                    else if (d.data.genere === 'D') classes += ' female';
+                    return classes;
+                })
+                .attr('r', d => d.data.virtual ? 25 : 35);
+
+            // Iniciales en nodos
+            nodes.append('text')
+                .attr('class', 'tree-node-initials')
+                .attr('dy', '0.35em')
+                .text(d => {
+                    if (d.data.virtual) return '👨‍👩‍👧‍👦';
+                    return getInitials(d.data.nom);
+                });
+
+            // Nombres debajo de los nodos
+            nodes.append('text')
+                .attr('class', 'tree-node-text')
+                .attr('dy', '3.5em')
+                .text(d => {
+                    if (d.data.virtual) return d.data.nom;
+                    const deceased = d.data.viu === 'No' ? ' 🕊️' : '';
+                    return d.data.nom + deceased;
+                });
+
+            // Años de nacimiento
+            nodes.filter(d => !d.data.virtual && d.data.anyNaixement)
+                .append('text')
+                .attr('class', 'tree-node-subtext')
+                .attr('dy', '5em')
+                .text(d => {
+                    if (d.data.viu === 'No') {
+                        return `(${d.data.anyNaixement} - ?)`;
+                    }
+                    const age = new Date().getFullYear() - d.data.anyNaixement;
+                    return `(${age} anys)`;
+                });
+
+            // Centrar vista inicial
+            const initialTransform = d3.zoomIdentity
+                .translate(100, height / 2)
+                .scale(0.8);
+
+            familyTreeSvg.call(familyTreeZoom.transform, initialTransform);
+        }
+
+        /**
+         * Controles de zoom del árbol
+         */
+        function zoomInTree() {
+            if (familyTreeSvg && familyTreeZoom) {
+                familyTreeSvg.transition().duration(300).call(
+                    familyTreeZoom.scaleBy, 1.3
+                );
+            }
+        }
+
+        function zoomOutTree() {
+            if (familyTreeSvg && familyTreeZoom) {
+                familyTreeSvg.transition().duration(300).call(
+                    familyTreeZoom.scaleBy, 0.7
+                );
+            }
+        }
+
+        function resetZoomTree() {
+            if (familyTreeSvg && familyTreeZoom) {
+                const container = document.getElementById('familyTreeContainer');
+                const height = container.clientHeight;
+
+                const resetTransform = d3.zoomIdentity
+                    .translate(100, height / 2)
+                    .scale(0.8);
+
+                familyTreeSvg.transition().duration(750).call(
+                    familyTreeZoom.transform, resetTransform
+                );
+            }
+        }
+
+        /**
+         * Construir HTML con información de relaciones familiares
+         */
+        function buildFamilyInfoHtml(persona) {
+            let html = '<div style="font-size: 0.95rem;"><strong>👨‍👩‍👧‍👦 Família:</strong><br>';
+            let hasRelations = false;
+
+            // Padre
+            if (persona.pareId) {
+                const pare = dadesAniversaris.find(p => p.rowNumber === persona.pareId);
+                if (pare) {
+                    html += `<div style="margin-top: 8px;">👨 Pare: ${pare.nom}</div>`;
+                    hasRelations = true;
+                }
+            }
+
+            // Madre
+            if (persona.mareId) {
+                const mare = dadesAniversaris.find(p => p.rowNumber === persona.mareId);
+                if (mare) {
+                    html += `<div style="margin-top: 8px;">👩 Mare: ${mare.nom}</div>`;
+                    hasRelations = true;
+                }
+            }
+
+            // Pareja
+            if (persona.parellaId) {
+                const parella = dadesAniversaris.find(p => p.rowNumber === persona.parellaId);
+                if (parella) {
+                    const icon = parella.genere === 'H' ? '👨' : '👩';
+                    html += `<div style="margin-top: 8px;">${icon} Parella: ${parella.nom}</div>`;
+                    hasRelations = true;
+                }
+            }
+
+            // Hijos
+            const fills = dadesAniversaris.filter(p =>
+                p.pareId === persona.rowNumber || p.mareId === persona.rowNumber
+            );
+            if (fills.length > 0) {
+                html += `<div style="margin-top: 8px;">👶 Fills: ${fills.map(f => f.nom).join(', ')}</div>`;
+                hasRelations = true;
+            }
+
+            // Hermanos
+            if (persona.pareId || persona.mareId) {
+                const germans = dadesAniversaris.filter(p =>
+                    p.rowNumber !== persona.rowNumber &&
+                    ((p.pareId && p.pareId === persona.pareId) || (p.mareId && p.mareId === persona.mareId))
+                );
+                if (germans.length > 0) {
+                    html += `<div style="margin-top: 8px;">👫 Germans: ${germans.map(g => g.nom).join(', ')}</div>`;
+                    hasRelations = true;
+                }
+            }
+
+            html += '</div>';
+            return hasRelations ? html : '';
+        }
+
+        // Listener para cerrar modal con ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const treeModal = document.getElementById('familyTreeModal');
+                if (treeModal.classList.contains('show')) {
+                    closeFamilyTree();
+                }
+            }
+        });
+
+        // ============================================
+        // FIN MÓDULO DE ÁRBOL GENEALÓGICO
+        // ============================================
 
         // Variables para gestión de datos
         let currentEditingIndex = -1;
@@ -2672,6 +3477,16 @@
             document.getElementById('formEmail').value = '';
             document.getElementById('formGenere').value = '';
             document.getElementById('formViu').value = '';
+
+            // Limpiar campos de relaciones familiares
+            document.getElementById('formPare').value = '';
+            document.getElementById('formMare').value = '';
+            document.getElementById('formParella').value = '';
+            document.getElementById('formUrlFoto').value = '';
+
+            // Poblar dropdowns de relaciones
+            populateFamilyDropdowns();
+
             document.getElementById('deleteBtn').classList.add('hidden');
             currentEditingIndex = -1;
             currentEditingPerson = null;
@@ -2691,6 +3506,14 @@
             document.getElementById('formEmail').value = currentEditingPerson.email || '';
             document.getElementById('formGenere').value = currentEditingPerson.genere || '';
             document.getElementById('formViu').value = currentEditingPerson.viu || '';
+
+            // Poblar y cargar valores de relaciones familiares
+            populateFamilyDropdowns(currentEditingPerson.rowNumber);
+            document.getElementById('formPare').value = currentEditingPerson.pareId || '';
+            document.getElementById('formMare').value = currentEditingPerson.mareId || '';
+            document.getElementById('formParella').value = currentEditingPerson.parellaId || '';
+            document.getElementById('formUrlFoto').value = currentEditingPerson.urlFoto || '';
+
             document.getElementById('deleteBtn').classList.remove('hidden');
 
             // Encontrar índice Y preservar rowNumber para identificación precisa
@@ -2764,6 +3587,33 @@
             const genere = document.getElementById('formGenere').value;
             const viu = document.getElementById('formViu').value;
 
+            // Capturar campos de relaciones familiares
+            const pareId = document.getElementById('formPare').value ? parseInt(document.getElementById('formPare').value) : null;
+            const mareId = document.getElementById('formMare').value ? parseInt(document.getElementById('formMare').value) : null;
+            const parellaId = document.getElementById('formParella').value ? parseInt(document.getElementById('formParella').value) : null;
+            const urlFoto = document.getElementById('formUrlFoto').value.trim();
+
+            // Validar relaciones circulares
+            if (pareId && mareId && pareId === mareId) {
+                alert('El pare i la mare no poden ser la mateixa persona');
+                return;
+            }
+
+            if (currentEditingPerson && currentEditingPerson.rowNumber) {
+                if (pareId === currentEditingPerson.rowNumber) {
+                    alert('Una persona no pot ser el seu propi pare');
+                    return;
+                }
+                if (mareId === currentEditingPerson.rowNumber) {
+                    alert('Una persona no pot ser la seva pròpia mare');
+                    return;
+                }
+                if (parellaId === currentEditingPerson.rowNumber) {
+                    alert('Una persona no pot ser la seva pròpia parella');
+                    return;
+                }
+            }
+
             // Validaciones básicas de formato
             if (dia < 1 || dia > 31) {
                 alert('El dia ha de ser entre 1 i 31');
@@ -2810,7 +3660,7 @@
             const isEditing = currentEditingIndex >= 0;
             const oldBirthday = isEditing ? { ...dadesAniversaris[currentEditingIndex] } : null; // Deep copy para preservar rowNumber
 
-            const newBirthday = { nom, dia, mes, anyNaixement, telefon, email, genere, viu };
+            const newBirthday = { nom, dia, mes, anyNaixement, telefon, email, genere, viu, pareId, mareId, parellaId, urlFoto };
 
             // Si está editando, preservar rowNumber del dato antiguo
             if (isEditing && oldBirthday && oldBirthday.rowNumber) {
@@ -3079,8 +3929,9 @@
             updateUpcomingBirthdays();
             setInterval(updateUpcomingBirthdays, 1000); // Cada segundo para actualizar el contador
 
-            // Mostrar botón de agregar
+            // Mostrar botones flotantes
             document.getElementById('addBtn').classList.remove('hidden');
+            document.getElementById('treeBtn').classList.remove('hidden');
 
             // Event listeners para swipe
             const container = document.querySelector('.container');
