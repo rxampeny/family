@@ -2161,11 +2161,15 @@
             const today = new Date();
             const currentYear = today.getFullYear();
 
-            const proxims = dadesAniversaris.map(d => {
-                const cumple = new Date(currentYear, d.mes - 1, d.dia);
-                const fecha = (cumple < today) ? new Date(currentYear + 1, d.mes - 1, d.dia) : cumple;
-                return { nom: d.nom, dia: d.dia, mes: d.mes, fecha };
-            }).sort((a, b) => a.fecha - b.fecha);
+            // Filtrar solo personas con día y mes válidos
+            const proxims = dadesAniversaris
+                .filter(d => d.dia && d.mes && !isNaN(d.dia) && !isNaN(d.mes))
+                .map(d => {
+                    const cumple = new Date(currentYear, d.mes - 1, d.dia);
+                    const fecha = (cumple < today) ? new Date(currentYear + 1, d.mes - 1, d.dia) : cumple;
+                    return { nom: d.nom, dia: d.dia, mes: d.mes, fecha };
+                })
+                .sort((a, b) => a.fecha - b.fecha);
 
             return proxims.slice(0, 2);
         }
@@ -2180,7 +2184,7 @@
             const hoyTexto = getFormattedToday();
             const diff = nextBday ? (nextBday.fecha - now) : 0;
 
-            const cumpleHoy = dadesAniversaris.filter(d => d.dia === now.getDate() && d.mes === (now.getMonth() + 1));
+            const cumpleHoy = dadesAniversaris.filter(d => d.dia && d.mes && d.dia === now.getDate() && d.mes === (now.getMonth() + 1));
             let hoyMsg = `<div style="font-size: 0.95rem; margin-bottom: 2px; text-align: center;">📅 <strong class="glow-text">${hoyTexto}</strong></div>`;
 
             if (cumpleHoy.length > 0) {
@@ -2541,7 +2545,7 @@
             const daysInPrevMonth = getDiesMes(mes - 1);
 
             const dayNames = ['Dl', 'Dt', 'Dc', 'Dj', 'Dv', 'Ds', 'Dg'];
-            const aniversarisMes = dadesAniversaris.filter(d => d.mes === mes);
+            const aniversarisMes = dadesAniversaris.filter(d => d.dia && d.mes && d.mes === mes);
 
             let html = `<div class="calendar-header">
                 <h3 style="margin: 0; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 1.3rem;">${getMesName(mes)} ${year}</h3>
@@ -2620,7 +2624,7 @@
 
         // Función para mostrar detalles de un día del calendario
         function showCalendarDayDetails(dia, mes) {
-            const birthdays = dadesAniversaris.filter(d => d.mes === mes && d.dia === dia);
+            const birthdays = dadesAniversaris.filter(d => d.dia && d.mes && d.mes === mes && d.dia === dia);
             if (birthdays.length === 1) {
                 showBirthdayDetails(birthdays[0]);
             } else if (birthdays.length > 1) {
