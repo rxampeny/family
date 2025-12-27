@@ -832,12 +832,55 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
         }
 
         .family-tree-header h2 {
             margin: 0;
             font-size: 1.5rem;
             font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .tree-search-container {
+            flex: 1;
+            max-width: 400px;
+            min-width: 200px;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .tree-search-container .search-icon {
+            position: absolute;
+            left: 12px;
+            font-size: 1.2rem;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .tree-search-input {
+            width: 100%;
+            padding: 10px 12px 10px 40px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .tree-search-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .tree-search-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.25);
+            border-color: white;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
         }
 
         .family-tree-close {
@@ -1223,8 +1266,26 @@
 
         /* Responsive */
         @media (max-width: 768px) {
+            .family-tree-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+
             .family-tree-header h2 {
                 font-size: 1.2rem;
+                text-align: center;
+            }
+
+            .tree-search-container {
+                max-width: 100%;
+                order: 2;
+            }
+
+            .family-tree-close {
+                position: absolute;
+                top: 15px;
+                right: 15px;
             }
 
             .tree-controls {
@@ -1945,6 +2006,11 @@
             <div class="family-tree-modal" id="familyTreeModal">
                 <div class="family-tree-header">
                     <h2>🌳 Arbre Genealògic Familiar</h2>
+                    <!-- Buscador dentro del árbol -->
+                    <div class="tree-search-container">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="treeSearchInput" class="tree-search-input" placeholder="Buscar persona...">
+                    </div>
                     <button class="family-tree-close" onclick="closeFamilyTree()" title="Tancar (ESC)">
                         ✕
                     </button>
@@ -3035,6 +3101,12 @@
             modal.classList.add('show');
             document.body.style.overflow = 'hidden';
 
+            // Limpiar buscador al abrir
+            const treeSearchInput = document.getElementById('treeSearchInput');
+            if (treeSearchInput) {
+                treeSearchInput.value = '';
+            }
+
             // Mostrar loading spinner mientras se cargan datos
             const container = document.getElementById('familyTreeContainer');
             showLoadingSpinner(container);
@@ -3047,6 +3119,9 @@
             // Siempre mostrar vista de lista
             setTimeout(() => {
                 renderFamilyList();
+
+                // Agregar event listener al buscador del árbol
+                setupTreeSearch();
             }, 50);
         }
 
@@ -3057,6 +3132,45 @@
             const modal = document.getElementById('familyTreeModal');
             modal.classList.remove('show');
             document.body.style.overflow = '';
+        }
+
+        /**
+         * Configurar buscador del árbol genealógico
+         */
+        function setupTreeSearch() {
+            const treeSearchInput = document.getElementById('treeSearchInput');
+            if (!treeSearchInput) return;
+
+            // Remover event listener anterior si existe
+            const newInput = treeSearchInput.cloneNode(true);
+            treeSearchInput.parentNode.replaceChild(newInput, treeSearchInput);
+
+            // Agregar nuevo event listener
+            newInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                const cards = document.querySelectorAll('.family-list-card');
+
+                if (!searchTerm) {
+                    // Mostrar todas las tarjetas
+                    cards.forEach(card => {
+                        card.style.display = 'flex';
+                    });
+                    return;
+                }
+
+                // Filtrar tarjetas por nombre
+                cards.forEach(card => {
+                    const nameElement = card.querySelector('.family-list-name');
+                    if (nameElement) {
+                        const name = nameElement.textContent.toLowerCase();
+                        if (name.includes(searchTerm)) {
+                            card.style.display = 'flex';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    }
+                });
+            });
         }
 
         /**
@@ -4242,33 +4356,34 @@
                 return;
             }
 
-            // Crear contenedor de resultados
-            searchResultsContainer.innerHTML = '';
-
-            const resultsWrapper = document.createElement('div');
-            resultsWrapper.style.cssText = `
-                padding: 15px;
-                background: white;
-                border-radius: 12px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            let html = `
+                <div style="padding: 15px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                    <h3 style="margin: 0 0 15px 0; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 1.1rem;">
+                        🔍 ${filteredData.length} resultat${filteredData.length !== 1 ? 's' : ''} trobat${filteredData.length !== 1 ? 's' : ''}
+                    </h3>
+                    <div style="display: grid; gap: 10px;">
             `;
 
-            const title = document.createElement('h3');
-            title.style.cssText = 'margin: 0 0 15px 0; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 1.1rem;';
-            title.textContent = `🔍 ${filteredData.length} resultat${filteredData.length !== 1 ? 's' : ''} trobat${filteredData.length !== 1 ? 's' : ''}`;
-            resultsWrapper.appendChild(title);
-
-            const cardsContainer = document.createElement('div');
-            cardsContainer.style.cssText = 'display: grid; gap: 12px;';
-
-            // Usar la función createPersonCard para cada resultado
             filteredData.forEach(person => {
-                const card = createPersonCard(person);
-                cardsContainer.appendChild(card);
+                const mesNom = getMesName(person.mes);
+                html += `
+                    <div onclick='showBirthdayDetails(${JSON.stringify(person).replace(/'/g, "\\'")})'
+                         style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px; border-radius: 10px; color: white; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);"
+                         onmouseover="this.style.transform='scale(1.02)'"
+                         onmouseout="this.style.transform='scale(1)'">
+                        <div style="font-weight: 600; font-size: 1rem; margin-bottom: 3px;">${person.nom}</div>
+                        <div style="opacity: 0.9; font-size: 0.85rem;">📅 ${person.dia} de ${mesNom}</div>
+                        ${person.telefon ? `<div style="opacity: 0.9; font-size: 0.85rem;">📱 ${person.telefon}</div>` : ''}
+                    </div>
+                `;
             });
 
-            resultsWrapper.appendChild(cardsContainer);
-            searchResultsContainer.appendChild(resultsWrapper);
+            html += `
+                    </div>
+                </div>
+            `;
+
+            searchResultsContainer.innerHTML = html;
         }
 
         // Función centralizada para refrescar todas las vistas
