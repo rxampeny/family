@@ -2860,17 +2860,51 @@
         let familyTreeSvg, familyTreeG, familyTreeZoom;
 
         /**
+         * Mostrar spinner de carga en el contenedor del árbol
+         */
+        function showLoadingSpinner(container) {
+            const existing = container.querySelector('.tree-loading');
+            if (existing) return;
+
+            const spinner = document.createElement('div');
+            spinner.className = 'tree-loading';
+            spinner.style.cssText = `
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                text-align: center;
+                color: #667eea;
+                font-size: 1.2rem;
+            `;
+            spinner.innerHTML = `
+                <div class="loading-spinner" style="margin: 0 auto 20px;"></div>
+                <div>Carregant arbre familiar...</div>
+            `;
+            container.insertBefore(spinner, container.firstChild);
+        }
+
+        /**
          * Abrir modal del árbol genealógico
          */
-        function openFamilyTree() {
+        async function openFamilyTree() {
             const modal = document.getElementById('familyTreeModal');
             modal.classList.add('show');
             document.body.style.overflow = 'hidden';
 
-            // Renderizar árbol después de un breve delay para que el modal se abra
+            // Mostrar loading spinner mientras se cargan datos
+            const container = document.getElementById('familyTreeContainer');
+            showLoadingSpinner(container);
+
+            // Esperar a que datos estén cargados
+            if (dadesAniversaris.length === 0) {
+                await loadDataFromStorage();
+            }
+
+            // Solo renderizar después de que datos estén disponibles
             setTimeout(() => {
                 renderFamilyTree();
-            }, 100);
+            }, 50);
         }
 
         /**
@@ -3064,6 +3098,10 @@
         function renderFamilyTree() {
             const container = document.getElementById('familyTreeContainer');
 
+            // Limpiar spinner de carga
+            const spinner = container.querySelector('.tree-loading');
+            if (spinner) spinner.remove();
+
             // Limpiar SVG anterior (pero mantener controles y leyenda)
             const existingSvg = container.querySelector('svg');
             if (existingSvg) {
@@ -3132,28 +3170,40 @@
             // Detección de tipo de dispositivo
             const isMobile = width <= 768;
             const isTablet = width > 768 && width <= 1024;
+            const isVerticalLayout = isMobile && width < 600;
 
-            // Offsets responsivos (porcentajes)
-            const horizontalOffset = isMobile ? width * 0.1 : width * 0.15;
-            const verticalOffset = isMobile ? height * 0.05 : height * 0.1;
+            let xOffset, yOffset;
 
-            // Separación aumentada en móvil para touch targets
-            const siblingSeparation = isMobile ? 3 : 2;
-            const cousinSeparation = isMobile ? 4 : 2.5;
+            if (isVerticalLayout) {
+                // Layout VERTICAL (top-to-bottom) para móvil pequeño
+                const treeLayout = d3.tree()
+                    .size([width * 0.9, height * 0.85])
+                    .separation((a, b) => (a.parent === b.parent ? 1.8 : 2.2));
 
-            // Configurar layout de árbol responsive
-            const treeLayout = d3.tree()
-                .size([height - verticalOffset * 2, width - horizontalOffset * 2])
-                .separation((a, b) => {
-                    return (a.parent === b.parent ? siblingSeparation : cousinSeparation);
-                });
+                treeLayout(root);
 
-            // Calcular posiciones
-            treeLayout(root);
+                xOffset = 20;
+                yOffset = 50;
+            } else {
+                // Layout HORIZONTAL (left-to-right) para desktop/tablet
+                const horizontalOffset = isMobile ? width * 0.1 : width * 0.15;
+                const verticalOffset = isMobile ? height * 0.05 : height * 0.1;
 
-            // Offsets responsivos para posicionamiento de nodos
-            const xOffset = isMobile ? 50 : 150;
-            const yOffset = isMobile ? 30 : 75;
+                // Separación aumentada en móvil para touch targets
+                const siblingSeparation = isMobile ? 3 : 2;
+                const cousinSeparation = isMobile ? 4 : 2.5;
+
+                const treeLayout = d3.tree()
+                    .size([height - verticalOffset * 2, width - horizontalOffset * 2])
+                    .separation((a, b) => {
+                        return (a.parent === b.parent ? siblingSeparation : cousinSeparation);
+                    });
+
+                treeLayout(root);
+
+                xOffset = isMobile ? 50 : 150;
+                yOffset = isMobile ? 30 : 75;
+            }
 
             // NUEVO: Ajustar posiciones de madres para que estén al mismo nivel que padres
             root.descendants().forEach(node => {
@@ -3210,42 +3260,44 @@
             });
 
             // Renderizar enlaces normales (padre→hijo, padre→unión)
+            const linkGenerator = isVerticalLayout
+                ? d3.linkVertical()
+                    .x(d => d.x + xOffset)
+                    .y(d => d.y + yOffset)
+                : d3.linkHorizontal()
+                    .x(d => d.y + xOffset)
+                    .y(d => d.x + yOffset);
+
             familyTreeG.selectAll('.tree-link')
                 .data(normalLinks)
                 .enter()
                 .append('path')
                 .attr('class', 'tree-link')
-                .attr('d', d3.linkHorizontal()
-                    .x(d => d.y + xOffset)
-                    .y(d => d.x + yOffset)
-                );
+                .attr('d', linkGenerator);
 
-            // NUEVO: Renderizar enlaces de pareja (horizontal, punteado rosa)
+            // NUEVO: Renderizar enlaces de pareja (horizontal/vertical según layout, punteado rosa)
             familyTreeG.selectAll('.tree-link-partner')
                 .data(partnerLinks)
                 .enter()
                 .append('line')
                 .attr('class', 'tree-link-partner')
-                .attr('x1', d => d.source.y + xOffset)
-                .attr('y1', d => d.source.x + yOffset)
-                .attr('x2', d => d.target.y + xOffset)
-                .attr('y2', d => d.target.x + yOffset);
+                .attr('x1', d => isVerticalLayout ? d.source.x + xOffset : d.source.y + xOffset)
+                .attr('y1', d => isVerticalLayout ? d.source.y + yOffset : d.source.x + yOffset)
+                .attr('x2', d => isVerticalLayout ? d.target.x + xOffset : d.target.y + xOffset)
+                .attr('y2', d => isVerticalLayout ? d.target.y + yOffset : d.target.x + yOffset);
 
             // Función para actualizar enlaces cuando se arrastran nodos
             function updateLinks() {
                 // Actualizar enlaces normales
                 familyTreeG.selectAll('.tree-link')
-                    .attr('d', d3.linkHorizontal()
-                        .x(d => d.y + xOffset)
-                        .y(d => d.x + yOffset)
-                    );
+                    .attr('d', linkGenerator);
 
                 // Actualizar enlaces de pareja
                 familyTreeG.selectAll('.tree-link-partner')
-                    .attr('x1', d => d.source.y + xOffset)
-                    .attr('y1', d => d.source.x + yOffset)
-                    .attr('x2', d => d.target.y + xOffset)
-                    .attr('y2', d => d.target.x + yOffset);
+                    .attr('x1', d => isVerticalLayout ? d.source.x + xOffset : d.source.y + xOffset)
+                    .attr('y1', d => isVerticalLayout ? d.source.y + yOffset : d.source.x + yOffset)
+                    .attr('x2', d => isVerticalLayout ? d.target.x + xOffset : d.target.y + xOffset)
+                    .attr('y2', d => isVerticalLayout ? d.target.y + yOffset : d.target.x + yOffset);
             }
 
             // Renderizar nodos
@@ -3254,7 +3306,13 @@
                 .enter()
                 .append('g')
                 .attr('class', 'tree-node')
-                .attr('transform', d => `translate(${d.y + xOffset}, ${d.x + yOffset})`)
+                .attr('transform', d => {
+                    if (isVerticalLayout) {
+                        return `translate(${d.x + xOffset}, ${d.y + yOffset})`;
+                    } else {
+                        return `translate(${d.y + xOffset}, ${d.x + yOffset})`;
+                    }
+                })
                 .style('cursor', 'move')
                 .call(createDragHandler(updateLinks))
                 .on('click', (event, d) => {
@@ -3304,19 +3362,31 @@
                     return getInitials(d.data.nom);
                 });
 
-            // Nombres debajo de los nodos (NUEVO: NO mostrar para nodos de unión)
+            // Nombres debajo de los nodos (NUEVO: NO mostrar para nodos de unión, abreviar en móvil)
             nodes.filter(d => !d.data.isCoupleUnion)
                 .append('text')
                 .attr('class', 'tree-node-text')
                 .attr('dy', '3.5em')
                 .text(d => {
                     if (d.data.virtual) return d.data.nom;
+
+                    let name = d.data.nom;
+
+                    // Abreviar nombres largos en móvil
+                    if (isMobile && name.length > 15) {
+                        const parts = name.split(' ');
+                        name = parts[0] + (parts.length > 1 ? ' ' + parts[parts.length - 1][0] + '.' : '');
+                    }
+
                     const deceased = d.data.viu === 'No' ? ' 🕊️' : '';
-                    return d.data.nom + deceased;
+                    return name + deceased;
                 });
 
-            // Años de nacimiento (NUEVO: Solo para personas reales, no nodos de unión)
-            nodes.filter(d => !d.data.virtual && !d.data.isCoupleUnion && d.data.anyNaixement)
+            // Años de nacimiento (NUEVO: Solo para personas reales, no nodos de unión, ocultar en móvil muy pequeño)
+            nodes.filter(d => {
+                const isVerySmall = width < 500;
+                return !d.data.virtual && !d.data.isCoupleUnion && d.data.anyNaixement && !isVerySmall;
+            })
                 .append('text')
                 .attr('class', 'tree-node-subtext')
                 .attr('dy', '5em')
@@ -3328,9 +3398,9 @@
                     return `(${age} anys)`;
                 });
 
-            // Centrar vista inicial con zoom responsive
-            const initialScale = isMobile ? 0.4 : (isTablet ? 0.6 : 0.8);
-            const initialX = isMobile ? 20 : 100;
+            // Centrar vista inicial con zoom responsive (más alejado en móvil pequeño)
+            const initialScale = width < 500 ? 0.25 : (isMobile ? 0.35 : (isTablet ? 0.6 : 0.8));
+            const initialX = isMobile ? 10 : 100;
 
             const initialTransform = d3.zoomIdentity
                 .translate(initialX, height / 2)
