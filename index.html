@@ -3760,6 +3760,22 @@
                 panel.appendChild(createRelationSection('Pares', pares));
             }
 
+            // GERMANS (hermanos - personas que comparten al menos un padre)
+            const germans = dadesAniversaris.filter(p => {
+                // No incluir a la persona misma
+                if (p.rowNumber === person.rowNumber) return false;
+
+                // Compartir el mismo padre o la misma madre
+                const sharePare = person.pareId && p.pareId === person.pareId;
+                const shareMare = person.mareId && p.mareId === person.mareId;
+
+                return sharePare || shareMare;
+            });
+            if (germans.length > 0) {
+                hasRelations = true;
+                panel.appendChild(createRelationSection('Germans', germans));
+            }
+
             // FILLS (hijos - personas que tienen este rowNumber como pare o mare)
             const fills = dadesAniversaris.filter(p =>
                 p.pareId === person.rowNumber || p.mareId === person.rowNumber
