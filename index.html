@@ -1219,11 +1219,18 @@
             margin-bottom: 6px;
             cursor: pointer;
             transition: all 0.2s;
+            border: 1px solid transparent;
         }
 
         .relation-mini-card:hover {
-            background: #edf2f7;
+            background: linear-gradient(135deg, #e6f0ff 0%, #f0e6ff 100%);
             transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+            border-color: rgba(102, 126, 234, 0.2);
+        }
+
+        .relation-mini-card:active {
+            transform: translateX(2px) scale(0.98);
         }
 
         .relation-mini-icon {
@@ -3974,15 +3981,27 @@
             // Al hacer click en mini-tarjeta, buscar y expandir esa tarjeta principal
             miniCard.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const targetCard = document.querySelector(`[data-person-row="${person.rowNumber}"]`);
-                if (targetCard) {
-                    // Scroll a la tarjeta
-                    targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    // Expandirla después del scroll
-                    setTimeout(() => {
-                        toggleCardExpansion(targetCard, person);
-                    }, 300);
+
+                // Actualizar buscador del árbol
+                const treeSearchInput = document.getElementById('treeSearchInput');
+                if (treeSearchInput) {
+                    treeSearchInput.value = person.nom;
+                    // Disparar evento input para filtrar tarjetas
+                    treeSearchInput.dispatchEvent(new Event('input'));
                 }
+
+                // Esperar a que se complete el filtrado
+                setTimeout(() => {
+                    const targetCard = document.querySelector(`[data-person-row="${person.rowNumber}"]`);
+                    if (targetCard && targetCard.style.display !== 'none') {
+                        // Scroll a la tarjeta
+                        targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // Expandirla después del scroll
+                        setTimeout(() => {
+                            toggleCardExpansion(targetCard, person);
+                        }, 300);
+                    }
+                }, 100);
             });
 
             return miniCard;
