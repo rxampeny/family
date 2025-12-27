@@ -155,7 +155,7 @@ Por defecto, los **SMS están desactivados** en los recordatorios para ahorrar c
 
 3. **Verificar modo mantenimiento:**
    - El sistema NO enviará recordatorios si el modo mantenimiento está activo
-   - Revisa la celda S2 del Sheet (debe estar vacía o "No")
+   - Revisa la celda W2 del Sheet (debe estar vacía o "No")
 
 ### "Los recordatorios se envían a la hora incorrecta"
 

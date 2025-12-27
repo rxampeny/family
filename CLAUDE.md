@@ -50,7 +50,14 @@ Columns:
 - G: Gènere (gender: Masculí/Femení)
 - H: Viu (alive: Sí/No)
 - I: Última modificació (last modified timestamp)
-- J+: Logs (deletions, emails sent, SMS sent)
+- J: Pare ID (father ID)
+- K: Mare ID (mother ID)
+- L: Parella ID (partner ID)
+- M: URL Foto (photo URL)
+- N-V: Eliminados logs (deleted people records)
+- W: Manteniment (maintenance mode flag in W2)
+- X-AB: Log Email (email sending logs)
+- AC-AG: Log SMS (SMS sending logs)
 
 ## API Endpoints
 
@@ -204,7 +211,7 @@ All CSS is inline in `index.html` starting ~line 22. Look for the `<style>` tag.
 ### Reminders not sending
 - Verify trigger exists in Apps Script (⏰ Triggers)
 - Check tomorrow actually has birthdays (`testBirthdayReminders()`)
-- Check maintenance mode is off (cell S2 in Sheet)
+- Check maintenance mode is off (cell W2 in Sheet)
 
 ### SMS not working
 - Verify Twilio credentials in Code.gs
