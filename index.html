@@ -1117,6 +1117,86 @@
             padding-left: 5px;
         }
 
+        /* Panel de relaciones expandido */
+        .family-card-expanded {
+            border: 2px solid #667eea !important;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.2) !important;
+        }
+
+        .family-relations-panel {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e2e8f0;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 1000px;
+            }
+        }
+
+        .relation-section {
+            margin-bottom: 15px;
+        }
+
+        .relation-section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .relation-mini-card {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .relation-mini-card:hover {
+            background: #edf2f7;
+            transform: translateX(4px);
+        }
+
+        .relation-mini-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .relation-mini-info {
+            flex: 1;
+        }
+
+        .relation-mini-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #2d3748;
+        }
+
+        .relation-mini-detail {
+            font-size: 0.8rem;
+            color: #a0aec0;
+        }
+
         /* Leyenda */
         .family-tree-legend {
             position: absolute;
@@ -2988,40 +3068,9 @@
                 await loadDataFromStorage();
             }
 
-            // Detectar si es móvil
-            const isMobile = window.innerWidth <= 768;
-            const toggleBtn = document.getElementById('treeViewToggle');
-
-            // Mostrar/ocultar botón toggle solo en móvil
-            if (toggleBtn) {
-                toggleBtn.style.display = isMobile ? 'flex' : 'none';
-            }
-
-            // En móvil, determinar qué vista mostrar
-            let viewToShow = 'tree';
-            if (isMobile) {
-                // Por defecto en móvil mostrar lista, pero respetar preferencia guardada
-                viewToShow = localStorage.getItem('familyTreeView') || 'list';
-            }
-
-            // Actualizar botón toggle y botones de zoom
-            if (toggleBtn) {
-                toggleBtn.textContent = viewToShow === 'tree' ? '📋' : '🌳';
-                toggleBtn.title = viewToShow === 'tree' ? 'Vista de llista' : 'Vista d\'arbre';
-            }
-
-            const zoomButtons = document.querySelectorAll('.tree-zoom-btn');
-            zoomButtons.forEach(btn => {
-                btn.style.display = viewToShow === 'tree' ? 'flex' : 'none';
-            });
-
-            // Solo renderizar después de que datos estén disponibles
+            // Siempre mostrar vista de lista
             setTimeout(() => {
-                if (viewToShow === 'list') {
-                    renderFamilyList();
-                } else {
-                    renderFamilyTree();
-                }
+                renderFamilyList();
             }, 50);
         }
 
@@ -3648,12 +3697,169 @@
                 </div>
             `;
 
-            // Al hacer click, mostrar detalles
-            card.addEventListener('click', () => {
-                showBirthdayDetails(person);
+            // Guardar datos de la persona en el elemento
+            card.dataset.personRow = person.rowNumber;
+
+            // Al hacer click, expandir/colapsar para mostrar relaciones
+            card.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleCardExpansion(card, person);
             });
 
             return card;
+        }
+
+        /**
+         * Expandir/colapsar tarjeta para mostrar relaciones
+         */
+        function toggleCardExpansion(card, person) {
+            const isExpanded = card.classList.contains('family-card-expanded');
+
+            // Cerrar todas las tarjetas expandidas
+            document.querySelectorAll('.family-card-expanded').forEach(c => {
+                c.classList.remove('family-card-expanded');
+                const panel = c.querySelector('.family-relations-panel');
+                if (panel) panel.remove();
+            });
+
+            // Si ya estaba expandida, solo cerrar
+            if (isExpanded) {
+                return;
+            }
+
+            // Expandir esta tarjeta
+            card.classList.add('family-card-expanded');
+
+            // Crear panel de relaciones
+            const relationsPanel = createRelationsPanel(person);
+            card.appendChild(relationsPanel);
+
+            // Scroll suave a la tarjeta expandida
+            setTimeout(() => {
+                card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        /**
+         * Crear panel de relaciones de una persona
+         */
+        function createRelationsPanel(person) {
+            const panel = document.createElement('div');
+            panel.className = 'family-relations-panel';
+
+            let hasRelations = false;
+
+            // PAREJA
+            if (person.parellaId) {
+                const pareja = dadesAniversaris.find(p => p.rowNumber === person.parellaId);
+                if (pareja) {
+                    hasRelations = true;
+                    panel.appendChild(createRelationSection('Parella', [pareja]));
+                }
+            }
+
+            // PARES (padre y madre)
+            const pares = [];
+            if (person.pareId) {
+                const pare = dadesAniversaris.find(p => p.rowNumber === person.pareId);
+                if (pare) pares.push(pare);
+            }
+            if (person.mareId) {
+                const mare = dadesAniversaris.find(p => p.rowNumber === person.mareId);
+                if (mare) pares.push(mare);
+            }
+            if (pares.length > 0) {
+                hasRelations = true;
+                panel.appendChild(createRelationSection('Pares', pares));
+            }
+
+            // FILLS (hijos - personas que tienen este rowNumber como pare o mare)
+            const fills = dadesAniversaris.filter(p =>
+                p.pareId === person.rowNumber || p.mareId === person.rowNumber
+            );
+            if (fills.length > 0) {
+                hasRelations = true;
+                panel.appendChild(createRelationSection('Fills', fills));
+            }
+
+            // Si no hay relaciones
+            if (!hasRelations) {
+                panel.innerHTML = '<div style="text-align: center; color: #a0aec0; padding: 10px;">No hi ha relacions registrades</div>';
+            }
+
+            return panel;
+        }
+
+        /**
+         * Crear sección de relación (Pareja, Pares, Fills)
+         */
+        function createRelationSection(title, people) {
+            const section = document.createElement('div');
+            section.className = 'relation-section';
+
+            const titleEl = document.createElement('div');
+            titleEl.className = 'relation-section-title';
+            titleEl.textContent = title;
+            section.appendChild(titleEl);
+
+            people.forEach(person => {
+                section.appendChild(createRelationMiniCard(person));
+            });
+
+            return section;
+        }
+
+        /**
+         * Crear mini-tarjeta de relación
+         */
+        function createRelationMiniCard(person) {
+            const miniCard = document.createElement('div');
+            miniCard.className = 'relation-mini-card';
+
+            // Determinar clase de icono
+            let iconClass = 'relation-mini-icon ';
+            if (person.viu === 'No') {
+                iconClass += 'deceased';
+            } else if (person.genere === 'Masculí') {
+                iconClass += 'male';
+            } else {
+                iconClass += 'female';
+            }
+
+            const icon = person.genere === 'Masculí' ? '👨' : '👩';
+            const deceasedIcon = person.viu === 'No' ? ' 🕊️' : '';
+
+            let ageInfo = '';
+            if (person.anyNaixement) {
+                const age = new Date().getFullYear() - person.anyNaixement;
+                ageInfo = person.viu === 'No' ? `${person.anyNaixement}` : `${age} anys`;
+            }
+
+            miniCard.innerHTML = `
+                <div class="${iconClass}">
+                    ${icon}
+                </div>
+                <div class="relation-mini-info">
+                    <div class="relation-mini-name">${person.nom}${deceasedIcon}</div>
+                    <div class="relation-mini-detail">${ageInfo}</div>
+                </div>
+            `;
+
+            // Al hacer click en mini-tarjeta, buscar y expandir esa tarjeta principal
+            miniCard.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const targetCard = document.querySelector(`[data-person-row="${person.rowNumber}"]`);
+                if (targetCard) {
+                    // Scroll a la tarjeta
+                    targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Expandirla después del scroll
+                    setTimeout(() => {
+                        toggleCardExpansion(targetCard, person);
+                    }, 300);
+                }
+            });
+
+            return miniCard;
         }
 
         /**
@@ -3886,6 +4092,26 @@
                     closeFamilyTree();
                 }
             }
+        });
+
+        // Listener para cerrar tarjetas expandidas al hacer click fuera
+        document.addEventListener('click', (e) => {
+            const treeModal = document.getElementById('familyTreeModal');
+            if (!treeModal || !treeModal.classList.contains('show')) {
+                return;
+            }
+
+            // Si el click fue en una tarjeta o sus hijos, no hacer nada
+            if (e.target.closest('.family-list-card')) {
+                return;
+            }
+
+            // Cerrar todas las tarjetas expandidas
+            document.querySelectorAll('.family-card-expanded').forEach(card => {
+                card.classList.remove('family-card-expanded');
+                const panel = card.querySelector('.family-relations-panel');
+                if (panel) panel.remove();
+            });
         });
 
         // ============================================
