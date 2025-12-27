@@ -1950,16 +1950,7 @@
                     </button>
                 </div>
                 <div class="family-tree-container" id="familyTreeContainer">
-                    <!-- El árbol se renderizará aquí con D3.js -->
-                    <div class="tree-controls">
-                        <button class="tree-control-btn tree-view-toggle" id="treeViewToggle" onclick="toggleTreeView()" title="Canviar vista" style="display: none;">
-                            📋
-                        </button>
-                        <button class="tree-control-btn tree-zoom-btn" onclick="zoomInTree()" title="Ampliar">+</button>
-                        <button class="tree-control-btn tree-zoom-btn" onclick="zoomOutTree()" title="Reduir">−</button>
-                        <button class="tree-control-btn tree-zoom-btn" onclick="resetZoomTree()" title="Reiniciar vista">⟲</button>
-                        <button class="tree-control-btn tree-zoom-btn" onclick="resetTreeLayout()" title="Reiniciar posicions">↺</button>
-                    </div>
+                    <!-- La vista de tarjetas se renderizará aquí -->
                 </div>
             </div>
         </div>
@@ -3652,18 +3643,18 @@
             // Si tiene foto, mostrarla
             if (person.urlFoto && person.urlFoto.trim()) {
                 iconClass += 'has-photo';
-                iconContent = `<img src="${person.urlFoto}" alt="${person.nom}" onerror="this.style.display='none'; this.parentElement.innerHTML='${person.genere === 'Masculí' ? '👨' : '👩'}';">`;
+                iconContent = `<img src="${person.urlFoto}" alt="${person.nom}" onerror="this.style.display='none'; this.parentElement.innerHTML='${person.genere === 'H' ? '👨' : '👩'}';">`;
             } else {
                 // Si no tiene foto, mostrar icono con color según género/estado
                 if (person.viu === 'No') {
                     iconClass += 'deceased';
-                } else if (person.genere === 'Masculí') {
+                } else if (person.genere === 'H') {
                     iconClass += 'male';
                 } else {
                     iconClass += 'female';
                 }
                 // Iconos más distintivos
-                iconContent = person.genere === 'Masculí' ? '👨' : '👩';
+                iconContent = person.genere === 'H' ? '👨' : '👩';
             }
 
             // Calcular edad
@@ -3817,17 +3808,17 @@
             // Si tiene foto, mostrarla
             if (person.urlFoto && person.urlFoto.trim()) {
                 iconClass += 'has-photo';
-                iconContent = `<img src="${person.urlFoto}" alt="${person.nom}" onerror="this.style.display='none'; this.parentElement.innerHTML='${person.genere === 'Masculí' ? '👨' : '👩'}';">`;
+                iconContent = `<img src="${person.urlFoto}" alt="${person.nom}" onerror="this.style.display='none'; this.parentElement.innerHTML='${person.genere === 'H' ? '👨' : '👩'}';">`;
             } else {
                 // Si no tiene foto, mostrar icono con color según género/estado
                 if (person.viu === 'No') {
                     iconClass += 'deceased';
-                } else if (person.genere === 'Masculí') {
+                } else if (person.genere === 'H') {
                     iconClass += 'male';
                 } else {
                     iconClass += 'female';
                 }
-                iconContent = person.genere === 'Masculí' ? '👨' : '👩';
+                iconContent = person.genere === 'H' ? '👨' : '👩';
             }
 
             const deceasedIcon = person.viu === 'No' ? ' 🕊️' : '';
