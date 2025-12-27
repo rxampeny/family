@@ -1087,6 +1087,18 @@
             background: linear-gradient(135deg, #c3cfe2 0%, #a8b5c9 100%);
         }
 
+        .family-list-icon img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .family-list-icon.has-photo {
+            background: #e2e8f0;
+            padding: 0;
+        }
+
         .family-list-info {
             flex: 1;
         }
@@ -1180,6 +1192,18 @@
             justify-content: center;
             font-size: 1.1rem;
             flex-shrink: 0;
+        }
+
+        .relation-mini-icon img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .relation-mini-icon.has-photo {
+            background: #e2e8f0;
+            padding: 0;
         }
 
         .relation-mini-info {
@@ -3656,12 +3680,23 @@
 
             // Determinar clase de icono
             let iconClass = 'family-list-icon ';
-            if (person.viu === 'No') {
-                iconClass += 'deceased';
-            } else if (person.genere === 'Masculí') {
-                iconClass += 'male';
+            let iconContent = '';
+
+            // Si tiene foto, mostrarla
+            if (person.urlFoto && person.urlFoto.trim()) {
+                iconClass += 'has-photo';
+                iconContent = `<img src="${person.urlFoto}" alt="${person.nom}" onerror="this.style.display='none'; this.parentElement.innerHTML='${person.genere === 'Masculí' ? '👨' : '👩'}';">`;
             } else {
-                iconClass += 'female';
+                // Si no tiene foto, mostrar icono con color según género/estado
+                if (person.viu === 'No') {
+                    iconClass += 'deceased';
+                } else if (person.genere === 'Masculí') {
+                    iconClass += 'male';
+                } else {
+                    iconClass += 'female';
+                }
+                // Iconos más distintivos
+                iconContent = person.genere === 'Masculí' ? '👨' : '👩';
             }
 
             // Calcular edad
@@ -3672,8 +3707,6 @@
                 ageInfo = person.viu === 'No' ? `${person.anyNaixement} 🕊️` : `${age} anys`;
             }
 
-            // Icono según género
-            const icon = person.genere === 'Masculí' ? '👨' : '👩';
             const deceasedIcon = person.viu === 'No' ? ' 🕊️' : '';
 
             // Fecha de cumpleaños
@@ -3681,7 +3714,7 @@
 
             card.innerHTML = `
                 <div class="${iconClass}">
-                    ${icon}
+                    ${iconContent}
                 </div>
                 <div class="family-list-info">
                     <div class="family-list-name">${person.nom}${deceasedIcon}</div>
@@ -3812,15 +3845,24 @@
 
             // Determinar clase de icono
             let iconClass = 'relation-mini-icon ';
-            if (person.viu === 'No') {
-                iconClass += 'deceased';
-            } else if (person.genere === 'Masculí') {
-                iconClass += 'male';
+            let iconContent = '';
+
+            // Si tiene foto, mostrarla
+            if (person.urlFoto && person.urlFoto.trim()) {
+                iconClass += 'has-photo';
+                iconContent = `<img src="${person.urlFoto}" alt="${person.nom}" onerror="this.style.display='none'; this.parentElement.innerHTML='${person.genere === 'Masculí' ? '👨' : '👩'}';">`;
             } else {
-                iconClass += 'female';
+                // Si no tiene foto, mostrar icono con color según género/estado
+                if (person.viu === 'No') {
+                    iconClass += 'deceased';
+                } else if (person.genere === 'Masculí') {
+                    iconClass += 'male';
+                } else {
+                    iconClass += 'female';
+                }
+                iconContent = person.genere === 'Masculí' ? '👨' : '👩';
             }
 
-            const icon = person.genere === 'Masculí' ? '👨' : '👩';
             const deceasedIcon = person.viu === 'No' ? ' 🕊️' : '';
 
             let ageInfo = '';
@@ -3831,7 +3873,7 @@
 
             miniCard.innerHTML = `
                 <div class="${iconClass}">
-                    ${icon}
+                    ${iconContent}
                 </div>
                 <div class="relation-mini-info">
                     <div class="relation-mini-name">${person.nom}${deceasedIcon}</div>
