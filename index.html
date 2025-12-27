@@ -3667,8 +3667,10 @@
 
             const deceasedIcon = person.viu === 'No' ? ' 🕊️' : '';
 
-            // Fecha de cumpleaños
-            const birthday = `${person.dia}/${person.mes}`;
+            // Fecha de cumpleaños con año
+            const birthday = person.anyNaixement
+                ? `${person.dia}/${person.mes}/${person.anyNaixement}`
+                : `${person.dia}/${person.mes}`;
 
             card.innerHTML = `
                 <div class="${iconClass}">
