@@ -1033,6 +1033,90 @@
             }
         }
 
+        /* Vista de lista para móvil */
+        .family-list-view {
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .family-list-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .family-list-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .family-list-card:active {
+            transform: translateY(0);
+        }
+
+        .family-list-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .family-list-icon.male {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .family-list-icon.female {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .family-list-icon.deceased {
+            background: linear-gradient(135deg, #c3cfe2 0%, #a8b5c9 100%);
+        }
+
+        .family-list-info {
+            flex: 1;
+        }
+
+        .family-list-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+            color: #2d3748;
+        }
+
+        .family-list-details {
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        .family-list-group {
+            margin-bottom: 25px;
+        }
+
+        .family-list-group-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #667eea;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            padding-left: 5px;
+        }
+
         /* Leyenda */
         .family-tree-legend {
             position: absolute;
@@ -1797,10 +1881,13 @@
                 <div class="family-tree-container" id="familyTreeContainer">
                     <!-- El árbol se renderizará aquí con D3.js -->
                     <div class="tree-controls">
-                        <button class="tree-control-btn" onclick="zoomInTree()" title="Ampliar">+</button>
-                        <button class="tree-control-btn" onclick="zoomOutTree()" title="Reduir">−</button>
-                        <button class="tree-control-btn" onclick="resetZoomTree()" title="Reiniciar vista">⟲</button>
-                        <button class="tree-control-btn" onclick="resetTreeLayout()" title="Reiniciar posicions">↺</button>
+                        <button class="tree-control-btn tree-view-toggle" id="treeViewToggle" onclick="toggleTreeView()" title="Canviar vista" style="display: none;">
+                            📋
+                        </button>
+                        <button class="tree-control-btn tree-zoom-btn" onclick="zoomInTree()" title="Ampliar">+</button>
+                        <button class="tree-control-btn tree-zoom-btn" onclick="zoomOutTree()" title="Reduir">−</button>
+                        <button class="tree-control-btn tree-zoom-btn" onclick="resetZoomTree()" title="Reiniciar vista">⟲</button>
+                        <button class="tree-control-btn tree-zoom-btn" onclick="resetTreeLayout()" title="Reiniciar posicions">↺</button>
                     </div>
                     <div class="family-tree-legend">
                         <div class="legend-item">🔵 Home</div>
@@ -2901,9 +2988,40 @@
                 await loadDataFromStorage();
             }
 
+            // Detectar si es móvil
+            const isMobile = window.innerWidth <= 768;
+            const toggleBtn = document.getElementById('treeViewToggle');
+
+            // Mostrar/ocultar botón toggle solo en móvil
+            if (toggleBtn) {
+                toggleBtn.style.display = isMobile ? 'flex' : 'none';
+            }
+
+            // En móvil, determinar qué vista mostrar
+            let viewToShow = 'tree';
+            if (isMobile) {
+                // Por defecto en móvil mostrar lista, pero respetar preferencia guardada
+                viewToShow = localStorage.getItem('familyTreeView') || 'list';
+            }
+
+            // Actualizar botón toggle y botones de zoom
+            if (toggleBtn) {
+                toggleBtn.textContent = viewToShow === 'tree' ? '📋' : '🌳';
+                toggleBtn.title = viewToShow === 'tree' ? 'Vista de llista' : 'Vista d\'arbre';
+            }
+
+            const zoomButtons = document.querySelectorAll('.tree-zoom-btn');
+            zoomButtons.forEach(btn => {
+                btn.style.display = viewToShow === 'tree' ? 'flex' : 'none';
+            });
+
             // Solo renderizar después de que datos estén disponibles
             setTimeout(() => {
-                renderFamilyTree();
+                if (viewToShow === 'list') {
+                    renderFamilyList();
+                } else {
+                    renderFamilyTree();
+                }
             }, 50);
         }
 
@@ -3410,6 +3528,135 @@
         }
 
         /**
+         * Renderizar vista de lista para móvil
+         */
+        function renderFamilyList() {
+            const container = document.getElementById('familyTreeContainer');
+
+            // Limpiar spinner y contenido anterior
+            const spinner = container.querySelector('.tree-loading');
+            if (spinner) spinner.remove();
+
+            const existingSvg = container.querySelector('svg');
+            if (existingSvg) existingSvg.remove();
+
+            const existingList = container.querySelector('.family-list-view');
+            if (existingList) existingList.remove();
+
+            // Si no hay datos
+            if (dadesAniversaris.length === 0) {
+                const message = document.createElement('div');
+                message.style.cssText = `
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    text-align: center;
+                    color: #6c757d;
+                    font-size: 1.2rem;
+                `;
+                message.innerHTML = `
+                    <div style="font-size: 4rem; margin-bottom: 20px;">👥</div>
+                    <div>No hi ha dades per mostrar</div>
+                `;
+                container.insertBefore(message, container.firstChild);
+                return;
+            }
+
+            // Crear contenedor de lista
+            const listView = document.createElement('div');
+            listView.className = 'family-list-view';
+
+            // Agrupar personas: vivas primero, luego fallecidas
+            const living = dadesAniversaris.filter(p => p.viu === 'Sí');
+            const deceased = dadesAniversaris.filter(p => p.viu === 'No');
+
+            // Ordenar alfabéticamente
+            living.sort((a, b) => a.nom.localeCompare(b.nom));
+            deceased.sort((a, b) => a.nom.localeCompare(b.nom));
+
+            // Renderizar personas vivas
+            if (living.length > 0) {
+                const livingGroup = document.createElement('div');
+                livingGroup.className = 'family-list-group';
+                livingGroup.innerHTML = `<div class="family-list-group-title">Família (${living.length})</div>`;
+
+                living.forEach(person => {
+                    livingGroup.appendChild(createPersonCard(person));
+                });
+
+                listView.appendChild(livingGroup);
+            }
+
+            // Renderizar personas fallecidas
+            if (deceased.length > 0) {
+                const deceasedGroup = document.createElement('div');
+                deceasedGroup.className = 'family-list-group';
+                deceasedGroup.innerHTML = `<div class="family-list-group-title">En memòria (${deceased.length})</div>`;
+
+                deceased.forEach(person => {
+                    deceasedGroup.appendChild(createPersonCard(person));
+                });
+
+                listView.appendChild(deceasedGroup);
+            }
+
+            container.insertBefore(listView, container.firstChild);
+        }
+
+        /**
+         * Crear tarjeta de persona para la vista de lista
+         */
+        function createPersonCard(person) {
+            const card = document.createElement('div');
+            card.className = 'family-list-card';
+
+            // Determinar clase de icono
+            let iconClass = 'family-list-icon ';
+            if (person.viu === 'No') {
+                iconClass += 'deceased';
+            } else if (person.genere === 'Masculí') {
+                iconClass += 'male';
+            } else {
+                iconClass += 'female';
+            }
+
+            // Calcular edad
+            let ageInfo = '';
+            if (person.anyNaixement) {
+                const currentYear = new Date().getFullYear();
+                const age = currentYear - person.anyNaixement;
+                ageInfo = person.viu === 'No' ? `${person.anyNaixement} 🕊️` : `${age} anys`;
+            }
+
+            // Icono según género
+            const icon = person.genere === 'Masculí' ? '👨' : '👩';
+            const deceasedIcon = person.viu === 'No' ? ' 🕊️' : '';
+
+            // Fecha de cumpleaños
+            const birthday = `${person.dia}/${person.mes}`;
+
+            card.innerHTML = `
+                <div class="${iconClass}">
+                    ${icon}
+                </div>
+                <div class="family-list-info">
+                    <div class="family-list-name">${person.nom}${deceasedIcon}</div>
+                    <div class="family-list-details">
+                        🎂 ${birthday}${ageInfo ? ' • ' + ageInfo : ''}
+                    </div>
+                </div>
+            `;
+
+            // Al hacer click, mostrar detalles
+            card.addEventListener('click', () => {
+                showBirthdayDetails(person);
+            });
+
+            return card;
+        }
+
+        /**
          * Controles de zoom del árbol
          */
         function zoomInTree() {
@@ -3456,6 +3703,37 @@
         function resetTreeLayout() {
             if (confirm('Això reiniciarà totes les posicions personalitzades dels nodes. Continuar?')) {
                 localStorage.removeItem('familyTreePositions');
+                renderFamilyTree();
+            }
+        }
+
+        /**
+         * Alternar entre vista de árbol y vista de lista (solo móvil)
+         */
+        function toggleTreeView() {
+            const currentView = localStorage.getItem('familyTreeView') || 'tree';
+            const newView = currentView === 'tree' ? 'list' : 'tree';
+
+            // Guardar preferencia
+            localStorage.setItem('familyTreeView', newView);
+
+            // Actualizar icono del botón
+            const toggleBtn = document.getElementById('treeViewToggle');
+            if (toggleBtn) {
+                toggleBtn.textContent = newView === 'tree' ? '📋' : '🌳';
+                toggleBtn.title = newView === 'tree' ? 'Vista de llista' : 'Vista d\'arbre';
+            }
+
+            // Ocultar/mostrar botones de zoom según vista
+            const zoomButtons = document.querySelectorAll('.tree-zoom-btn');
+            zoomButtons.forEach(btn => {
+                btn.style.display = newView === 'tree' ? 'flex' : 'none';
+            });
+
+            // Renderizar la vista correspondiente
+            if (newView === 'list') {
+                renderFamilyList();
+            } else {
                 renderFamilyTree();
             }
         }
