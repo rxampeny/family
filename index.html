@@ -921,6 +921,12 @@
             filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.6));
         }
 
+        .tree-node.dragging .tree-node-circle {
+            stroke-width: 6px;
+            filter: drop-shadow(0 0 12px rgba(102, 126, 234, 0.8));
+            opacity: 0.7;
+        }
+
         .tree-node-text {
             font-family: 'Inter', sans-serif;
             font-size: 13px;
@@ -959,6 +965,20 @@
             stroke: #f687b3;
             stroke-width: 3px;
             stroke-dasharray: 5, 5;
+        }
+
+        /* Nodos de unión de parejas */
+        .tree-node-circle.couple-union {
+            fill: #fbbf24;
+            stroke: #f59e0b;
+            stroke-width: 2px;
+            opacity: 0.8;
+        }
+
+        .tree-node:hover .tree-node-circle.couple-union {
+            opacity: 1;
+            stroke-width: 3px;
+            filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.6));
         }
 
         /* Leyenda */
@@ -1875,6 +1895,7 @@
                 <button class="tree-control-btn" onclick="zoomInTree()" title="Ampliar">+</button>
                 <button class="tree-control-btn" onclick="zoomOutTree()" title="Reduir">−</button>
                 <button class="tree-control-btn" onclick="resetZoomTree()" title="Reiniciar vista">⟲</button>
+                <button class="tree-control-btn" onclick="resetTreeLayout()" title="Reiniciar posicions">↺</button>
             </div>
             <div class="family-tree-legend">
                 <div class="legend-item">🔵 Home</div>
@@ -2863,7 +2884,7 @@
          * Construir estructura jerárquica para D3.js
          */
         function buildFamilyHierarchy() {
-            // Crear mapa de personas por rowNumber
+            // 1. Crear mapa de personas por rowNumber
             const peopleMap = new Map();
             dadesAniversaris.forEach(person => {
                 peopleMap.set(person.rowNumber, {
@@ -2872,10 +2893,53 @@
                 });
             });
 
+            // 2. NUEVO: Detectar parejas con hijos comunes y crear nodos de unión
+            const coupleUnions = new Map(); // key: "pareId-mareId"
+            const childrenAssigned = new Set(); // Rastrear hijos asignados a uniones
+
+            dadesAniversaris.forEach(person => {
+                const hasPare = person.pareId && peopleMap.has(person.pareId);
+                const hasMare = person.mareId && peopleMap.has(person.mareId);
+
+                // Si tiene AMBOS padres, es hijo común de una pareja
+                if (hasPare && hasMare) {
+                    const coupleKey = `${person.pareId}-${person.mareId}`;
+
+                    // Crear nodo de unión si no existe
+                    if (!coupleUnions.has(coupleKey)) {
+                        const pare = peopleMap.get(person.pareId);
+                        const mare = peopleMap.get(person.mareId);
+
+                        coupleUnions.set(coupleKey, {
+                            isCoupleUnion: true,
+                            coupleKey: coupleKey,
+                            pareId: person.pareId,
+                            mareId: person.mareId,
+                            pareName: pare.nom,
+                            mareName: mare.nom,
+                            children: [],
+                            virtual: true,
+                            nom: '💑'
+                        });
+                    }
+
+                    // Agregar hijo al nodo de unión
+                    coupleUnions.get(coupleKey).children.push(
+                        peopleMap.get(person.rowNumber)
+                    );
+                    childrenAssigned.add(person.rowNumber);
+                }
+            });
+
+            // 3. Construir jerarquía principal (SOLO hijos NO comunes)
             const roots = [];
 
-            // Identificar raíces y construir jerarquía
             dadesAniversaris.forEach(person => {
+                // Saltar si ya fue asignado como hijo común
+                if (childrenAssigned.has(person.rowNumber)) {
+                    return;
+                }
+
                 const hasPare = person.pareId && peopleMap.has(person.pareId);
                 const hasMare = person.mareId && peopleMap.has(person.mareId);
 
@@ -2883,30 +2947,46 @@
                     // Es una raíz
                     roots.push(peopleMap.get(person.rowNumber));
                 } else {
-                    // Agregar como hijo del padre (priorizamos padre sobre madre para evitar duplicados)
+                    // Agregar como hijo del padre o madre (solo un padre conocido)
                     if (hasPare) {
-                        peopleMap.get(person.pareId).children.push(peopleMap.get(person.rowNumber));
+                        peopleMap.get(person.pareId).children.push(
+                            peopleMap.get(person.rowNumber)
+                        );
                     } else if (hasMare) {
-                        peopleMap.get(person.mareId).children.push(peopleMap.get(person.rowNumber));
+                        peopleMap.get(person.mareId).children.push(
+                            peopleMap.get(person.rowNumber)
+                        );
                     }
                 }
             });
 
-            // Si no hay raíces, crear nodo virtual
+            // 4. NUEVO: Insertar nodos de unión en la jerarquía
+            coupleUnions.forEach((coupleNode) => {
+                const pare = peopleMap.get(coupleNode.pareId);
+                const mare = peopleMap.get(coupleNode.mareId);
+
+                // Agregar nodo de unión como hijo del padre
+                pare.children.push(coupleNode);
+
+                // Guardar referencia a la madre para renderizado de enlace de pareja
+                coupleNode.partnerNode = mare;
+            });
+
+            // 5. Retornar raíz única o nodo virtual
             if (roots.length === 0 && dadesAniversaris.length > 0) {
                 return {
                     nom: 'Família',
                     virtual: true,
-                    children: Array.from(peopleMap.values())
+                    children: Array.from(peopleMap.values()).filter(p =>
+                        !p.pareId && !p.mareId && !childrenAssigned.has(p.rowNumber)
+                    )
                 };
             }
 
-            // Si hay una sola raíz, retornarla
             if (roots.length === 1) {
                 return roots[0];
             }
 
-            // Si hay múltiples raíces, crear nodo virtual
             return {
                 nom: 'Família',
                 virtual: true,
@@ -2984,17 +3064,71 @@
             const hierarchyData = buildFamilyHierarchy();
             const root = d3.hierarchy(hierarchyData);
 
-            // Configurar layout de árbol
+            // Configurar layout de árbol (MODIFICADO: Mayor separación)
             const treeLayout = d3.tree()
-                .size([height - 150, width - 300])
-                .separation((a, b) => (a.parent === b.parent ? 1 : 1.2));
+                .size([height - 100, width - 200])
+                .separation((a, b) => (a.parent === b.parent ? 2 : 2.5));
 
             // Calcular posiciones
             treeLayout(root);
 
-            // Renderizar enlaces (líneas entre nodos)
+            // NUEVO: Ajustar posiciones de madres para que estén al mismo nivel que padres
+            root.descendants().forEach(node => {
+                if (node.data.isCoupleUnion) {
+                    // Este es un nodo de unión
+                    const pareNode = node.parent; // El padre del nodo de unión
+                    const mareNode = root.descendants().find(
+                        d => d.data.rowNumber === node.data.mareId
+                    );
+
+                    if (pareNode && mareNode) {
+                        // Ajustar la posición vertical (x en D3 tree) para que esté al mismo nivel
+                        mareNode.x = pareNode.x;
+                        // Ajustar posición horizontal (y en D3 tree) para que esté cerca
+                        mareNode.y = pareNode.y + 50; // Un poco a la derecha del padre
+                    }
+                }
+            });
+
+            // NUEVO: Restaurar posiciones personalizadas guardadas
+            const savedPositions = loadNodePositions();
+            root.descendants().forEach(node => {
+                if (node.data.rowNumber && savedPositions[node.data.rowNumber]) {
+                    node.x = savedPositions[node.data.rowNumber].x;
+                    node.y = savedPositions[node.data.rowNumber].y;
+                }
+            });
+
+            // NUEVO: Separar enlaces normales y de pareja
+            const normalLinks = [];
+            const partnerLinks = [];
+
+            root.links().forEach(link => {
+                if (link.target.data.isCoupleUnion) {
+                    normalLinks.push(link);
+
+                    // Crear enlace de pareja a la madre
+                    if (link.target.data.partnerNode) {
+                        const mareNode = root.descendants().find(
+                            d => d.data.rowNumber === link.target.data.mareId
+                        );
+
+                        if (mareNode) {
+                            partnerLinks.push({
+                                source: link.target,
+                                target: mareNode,
+                                isPartnerLink: true
+                            });
+                        }
+                    }
+                } else {
+                    normalLinks.push(link);
+                }
+            });
+
+            // Renderizar enlaces normales (padre→hijo, padre→unión)
             familyTreeG.selectAll('.tree-link')
-                .data(root.links())
+                .data(normalLinks)
                 .enter()
                 .append('path')
                 .attr('class', 'tree-link')
@@ -3003,6 +3137,34 @@
                     .y(d => d.x + 75)
                 );
 
+            // NUEVO: Renderizar enlaces de pareja (horizontal, punteado rosa)
+            familyTreeG.selectAll('.tree-link-partner')
+                .data(partnerLinks)
+                .enter()
+                .append('line')
+                .attr('class', 'tree-link-partner')
+                .attr('x1', d => d.source.y + 150)
+                .attr('y1', d => d.source.x + 75)
+                .attr('x2', d => d.target.y + 150)
+                .attr('y2', d => d.target.x + 75);
+
+            // Función para actualizar enlaces cuando se arrastran nodos
+            function updateLinks() {
+                // Actualizar enlaces normales
+                familyTreeG.selectAll('.tree-link')
+                    .attr('d', d3.linkHorizontal()
+                        .x(d => d.y + 150)
+                        .y(d => d.x + 75)
+                    );
+
+                // Actualizar enlaces de pareja
+                familyTreeG.selectAll('.tree-link-partner')
+                    .attr('x1', d => d.source.y + 150)
+                    .attr('y1', d => d.source.x + 75)
+                    .attr('x2', d => d.target.y + 150)
+                    .attr('y2', d => d.target.x + 75);
+            }
+
             // Renderizar nodos
             const nodes = familyTreeG.selectAll('.tree-node')
                 .data(root.descendants())
@@ -3010,8 +3172,11 @@
                 .append('g')
                 .attr('class', 'tree-node')
                 .attr('transform', d => `translate(${d.y + 150}, ${d.x + 75})`)
+                .style('cursor', 'move')
+                .call(createDragHandler(updateLinks))
                 .on('click', (event, d) => {
-                    if (!d.data.virtual) {
+                    // No permitir click en nodos virtuales ni nodos de unión
+                    if (!d.data.virtual && !d.data.isCoupleUnion) {
                         showBirthdayDetails(d.data);
                     }
                 });
@@ -3020,23 +3185,37 @@
             nodes.append('circle')
                 .attr('class', d => {
                     let classes = 'tree-node-circle';
-                    if (d.data.viu === 'No') classes += ' deceased';
-                    else if (d.data.genere === 'D') classes += ' female';
+                    // NUEVO: Clase especial para nodos de unión
+                    if (d.data.isCoupleUnion) {
+                        classes += ' couple-union';
+                    } else if (d.data.viu === 'No') {
+                        classes += ' deceased';
+                    } else if (d.data.genere === 'D') {
+                        classes += ' female';
+                    }
                     return classes;
                 })
-                .attr('r', d => d.data.virtual ? 25 : 35);
+                .attr('r', d => {
+                    // NUEVO: Nodos de unión más pequeños
+                    if (d.data.isCoupleUnion) return 20;
+                    if (d.data.virtual) return 25;
+                    return 35;
+                });
 
             // Iniciales en nodos
             nodes.append('text')
                 .attr('class', 'tree-node-initials')
                 .attr('dy', '0.35em')
                 .text(d => {
+                    // NUEVO: Icono 💑 para nodos de unión
+                    if (d.data.isCoupleUnion) return '💑';
                     if (d.data.virtual) return '👨‍👩‍👧‍👦';
                     return getInitials(d.data.nom);
                 });
 
-            // Nombres debajo de los nodos
-            nodes.append('text')
+            // Nombres debajo de los nodos (NUEVO: NO mostrar para nodos de unión)
+            nodes.filter(d => !d.data.isCoupleUnion)
+                .append('text')
                 .attr('class', 'tree-node-text')
                 .attr('dy', '3.5em')
                 .text(d => {
@@ -3045,8 +3224,8 @@
                     return d.data.nom + deceased;
                 });
 
-            // Años de nacimiento
-            nodes.filter(d => !d.data.virtual && d.data.anyNaixement)
+            // Años de nacimiento (NUEVO: Solo para personas reales, no nodos de unión)
+            nodes.filter(d => !d.data.virtual && !d.data.isCoupleUnion && d.data.anyNaixement)
                 .append('text')
                 .attr('class', 'tree-node-subtext')
                 .attr('dy', '5em')
@@ -3098,6 +3277,81 @@
                     familyTreeZoom.transform, resetTransform
                 );
             }
+        }
+
+        /**
+         * Resetear layout del árbol (borrar posiciones personalizadas)
+         */
+        function resetTreeLayout() {
+            if (confirm('Això reiniciarà totes les posicions personalitzades dels nodes. Continuar?')) {
+                localStorage.removeItem('familyTreePositions');
+                renderFamilyTree();
+            }
+        }
+
+        /**
+         * Guardar posiciones personalizadas de nodos
+         */
+        function saveNodePositions(positions) {
+            try {
+                localStorage.setItem('familyTreePositions', JSON.stringify(positions));
+            } catch (e) {
+                console.error('Error guardant posicions:', e);
+            }
+        }
+
+        /**
+         * Cargar posiciones personalizadas de nodos
+         */
+        function loadNodePositions() {
+            try {
+                const saved = localStorage.getItem('familyTreePositions');
+                return saved ? JSON.parse(saved) : {};
+            } catch (e) {
+                console.error('Error carregant posicions:', e);
+                return {};
+            }
+        }
+
+        /**
+         * Crear handler de drag para nodos
+         */
+        function createDragHandler(updateLinks) {
+            function dragStarted(event, d) {
+                d3.select(this).raise().classed('dragging', true);
+            }
+
+            function dragged(event, d) {
+                // Actualizar posición del nodo
+                d.x = event.y - 75;
+                d.y = event.x - 150;
+
+                d3.select(this).attr('transform', `translate(${event.x}, ${event.y})`);
+
+                // Actualizar enlaces conectados
+                updateLinks();
+            }
+
+            function dragEnded(event, d) {
+                d3.select(this).classed('dragging', false);
+
+                // Guardar posiciones
+                const positions = {};
+                d3.selectAll('.tree-node').each(function(node) {
+                    if (node.data.rowNumber) {
+                        positions[node.data.rowNumber] = {
+                            x: node.x,
+                            y: node.y
+                        };
+                    }
+                });
+                saveNodePositions(positions);
+            }
+
+            return d3.drag()
+                .on('start', dragStarted)
+                .on('drag', dragged)
+                .on('end', dragEnded);
         }
 
         /**
