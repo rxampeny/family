@@ -7,30 +7,32 @@
     </linearGradient>
   </defs>
 
-  <!-- Fondo que rellena todo -->
-  <rect width="512" height="512" fill="url(#gradLogin)"/>
+  <!-- Fondo redondeado -->
+  <rect width="512" height="512" rx="110" fill="url(#gradLogin)"/>
 
-  <!-- Regalo (gift box) -->
-  <!-- Caja principal -->
-  <rect x="120" y="200" width="272" height="200" fill="#fff" opacity="0.95" rx="10"/>
+  <!-- Regalo blanco centrado -->
+  <g transform="translate(256, 256)">
+    <!-- Caja principal -->
+    <rect x="-100" y="-60" width="200" height="160" fill="#fff" rx="8"/>
 
-  <!-- Lazo horizontal -->
-  <rect x="120" y="270" width="272" height="40" fill="#ffd700" opacity="0.9"/>
+    <!-- Cinta horizontal -->
+    <rect x="-100" y="-10" width="200" height="30" fill="#ffd700"/>
 
-  <!-- Lazo vertical -->
-  <rect x="236" y="200" width="40" height="200" fill="#ffd700" opacity="0.9"/>
+    <!-- Cinta vertical -->
+    <rect x="-15" y="-60" width="30" height="160" fill="#ffd700"/>
 
-  <!-- Tapa del regalo -->
-  <rect x="100" y="160" width="312" height="50" fill="#fff" opacity="0.95" rx="8"/>
-  <rect x="100" y="170" width="312" height="25" fill="#ffd700" opacity="0.9"/>
+    <!-- Lazo superior izquierdo -->
+    <ellipse cx="-40" cy="-70" rx="25" ry="18" fill="#ffd700"/>
 
-  <!-- Moño decorativo arriba -->
-  <ellipse cx="200" cy="150" rx="35" ry="25" fill="#ffd700" opacity="0.9"/>
-  <ellipse cx="312" cy="150" rx="35" ry="25" fill="#ffd700" opacity="0.9"/>
-  <circle cx="256" cy="135" r="18" fill="#ffd700" opacity="0.9"/>
+    <!-- Lazo superior derecho -->
+    <ellipse cx="40" cy="-70" rx="25" ry="18" fill="#ffd700"/>
+
+    <!-- Centro del lazo -->
+    <circle cx="0" cy="-75" r="12" fill="#ffd700"/>
+  </g>
 
   <!-- Texto abajo -->
-  <text x="256" y="475" font-family="Arial, sans-serif" font-size="48" fill="#fff" text-anchor="middle" font-weight="bold">
+  <text x="256" y="470" font-family="Arial, sans-serif" font-size="42" fill="#fff" text-anchor="middle" font-weight="600">
     Aniversaris
   </text>
 </svg>
