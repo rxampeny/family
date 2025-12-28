@@ -100,17 +100,42 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-        .header-container {
-            text-align: center;
-            margin-bottom: 20px;
+        .main-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
         }
 
-        .subtitle {
-            text-align: center;
-            font-size: 0.95rem;
-            color: #666;
-            margin: -10px 0 0 0;
+        .main-header-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .main-header-content {
+            text-align: left;
+        }
+
+        .main-header-title {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0 0 5px 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .main-header-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
             font-weight: 500;
+            margin: 0;
         }
 
         select {
@@ -406,6 +431,29 @@
             .container {
                 margin-bottom: 270px;
                 padding: 15px;
+            }
+
+            .main-header {
+                flex-direction: column;
+                padding: 20px;
+                gap: 15px;
+            }
+
+            .main-header-icon {
+                width: 60px;
+                height: 60px;
+            }
+
+            .main-header-content {
+                text-align: center;
+            }
+
+            .main-header-title {
+                font-size: 1.5rem;
+            }
+
+            .main-header-subtitle {
+                font-size: 0.9rem;
             }
 
             body {
@@ -2017,6 +2065,15 @@
         </button>
 
         <div class="container">
+            <!-- Capçalera amb icona i títol -->
+            <div class="main-header">
+                <img src="public/icon-login.svg" alt="Aniversaris familiars" class="main-header-icon">
+                <div class="main-header-content">
+                    <h1 class="main-header-title">Aniversaris familiars</h1>
+                    <p class="main-header-subtitle">Gestió d'aniversaris i arbre familiar</p>
+                </div>
+            </div>
+
             <div class="imatge-container">
                 <img src="public/placeholder-familia.svg" alt="Aniversaris familiars" style="max-width: 50%; height: auto; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);" />
             </div>
