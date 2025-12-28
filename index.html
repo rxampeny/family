@@ -3813,10 +3813,15 @@
             card.dataset.personRow = person.rowNumber;
 
             // Al hacer click, expandir/colapsar para mostrar relaciones
-            card.addEventListener('click', (e) => {
+            // Usar tanto click como touchend para compatibilidad móvil
+            const handleCardClick = (e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 toggleCardExpansion(card, person);
-            });
+            };
+
+            card.addEventListener('click', handleCardClick);
+            card.addEventListener('touchend', handleCardClick, { passive: false });
 
             return card;
         }
@@ -3983,7 +3988,8 @@
             `;
 
             // Al hacer click en mini-tarjeta, buscar y expandir esa tarjeta principal
-            miniCard.addEventListener('click', (e) => {
+            const handleMiniCardClick = (e) => {
+                e.preventDefault();
                 e.stopPropagation();
 
                 // Actualizar buscador del árbol
@@ -4006,7 +4012,10 @@
                         }, 300);
                     }
                 }, 100);
-            });
+            };
+
+            miniCard.addEventListener('click', handleMiniCardClick);
+            miniCard.addEventListener('touchend', handleMiniCardClick, { passive: false });
 
             return miniCard;
         }
