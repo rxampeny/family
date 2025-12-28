@@ -3139,21 +3139,23 @@
             const modal = document.getElementById('familyTreeModal');
             modal.classList.remove('show');
             document.body.style.overflow = '';
+
+            // Resetear flag del buscador para permitir re-configuración
+            treeSearchListenerAdded = false;
         }
 
         /**
          * Configurar buscador del árbol genealógico
          */
+        let treeSearchListenerAdded = false;
         function setupTreeSearch() {
             const treeSearchInput = document.getElementById('treeSearchInput');
             if (!treeSearchInput) return;
 
-            // Remover event listener anterior si existe
-            const newInput = treeSearchInput.cloneNode(true);
-            treeSearchInput.parentNode.replaceChild(newInput, treeSearchInput);
+            // Solo agregar el event listener una vez
+            if (treeSearchListenerAdded) return;
 
-            // Agregar nuevo event listener
-            newInput.addEventListener('input', function(e) {
+            treeSearchInput.addEventListener('input', function(e) {
                 const searchTerm = e.target.value.toLowerCase().trim();
                 const cards = document.querySelectorAll('.family-list-card');
 
@@ -3178,6 +3180,8 @@
                     }
                 });
             });
+
+            treeSearchListenerAdded = true;
         }
 
         /**
