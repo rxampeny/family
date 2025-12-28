@@ -4054,39 +4054,18 @@
         function resetTreeLayout() {
             if (confirm('Això reiniciarà totes les posicions personalitzades dels nodes. Continuar?')) {
                 localStorage.removeItem('familyTreePositions');
-                renderFamilyTree();
+                renderFamilyList();
             }
         }
 
         /**
          * Alternar entre vista de árbol y vista de lista (solo móvil)
+         * NOTA: Ahora siempre muestra vista de lista con tarjetas
          */
         function toggleTreeView() {
-            const currentView = localStorage.getItem('familyTreeView') || 'tree';
-            const newView = currentView === 'tree' ? 'list' : 'tree';
-
-            // Guardar preferencia
-            localStorage.setItem('familyTreeView', newView);
-
-            // Actualizar icono del botón
-            const toggleBtn = document.getElementById('treeViewToggle');
-            if (toggleBtn) {
-                toggleBtn.textContent = newView === 'tree' ? '📋' : '🌳';
-                toggleBtn.title = newView === 'tree' ? 'Vista de llista' : 'Vista d\'arbre';
-            }
-
-            // Ocultar/mostrar botones de zoom según vista
-            const zoomButtons = document.querySelectorAll('.tree-zoom-btn');
-            zoomButtons.forEach(btn => {
-                btn.style.display = newView === 'tree' ? 'flex' : 'none';
-            });
-
-            // Renderizar la vista correspondiente
-            if (newView === 'list') {
-                renderFamilyList();
-            } else {
-                renderFamilyTree();
-            }
+            // Siempre mostrar vista de lista
+            renderFamilyList();
+            setupTreeSearch();
         }
 
         /**
@@ -5101,8 +5080,9 @@
 
                 // Re-renderizar árbol si el modal está abierto
                 const treeModal = document.getElementById('familyTreeModal');
-                if (treeModal && treeModal.style.display !== 'none') {
-                    renderFamilyTree();
+                if (treeModal && treeModal.classList.contains('show')) {
+                    renderFamilyList();
+                    setupTreeSearch();
                 }
             }, 300); // Debounce 300ms
         });
