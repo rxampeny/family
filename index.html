@@ -3150,6 +3150,7 @@
          * Configurar buscador del árbol genealógico
          */
         let treeSearchListenerAdded = false;
+        let searchBlurTimeout;
         function setupTreeSearch() {
             const treeSearchInput = document.getElementById('treeSearchInput');
             if (!treeSearchInput) return;
@@ -3181,6 +3182,14 @@
                         }
                     }
                 });
+
+                // Cerrar teclado automáticamente después de buscar (móvil/tablet)
+                clearTimeout(searchBlurTimeout);
+                searchBlurTimeout = setTimeout(() => {
+                    if (searchTerm) {
+                        treeSearchInput.blur();
+                    }
+                }, 800); // Esperar 800ms después de dejar de escribir
             });
 
             treeSearchListenerAdded = true;
