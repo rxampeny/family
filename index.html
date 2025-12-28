@@ -3813,15 +3813,38 @@
             card.dataset.personRow = person.rowNumber;
 
             // Al hacer click, expandir/colapsar para mostrar relaciones
-            // Usar tanto click como touchend para compatibilidad móvil
-            const handleCardClick = (e) => {
-                e.preventDefault();
+            // Diferenciar entre tap y scroll en móvil
+            let touchStartY = 0;
+            let touchStartX = 0;
+            let isTouchMove = false;
+
+            card.addEventListener('touchstart', (e) => {
+                touchStartY = e.touches[0].clientY;
+                touchStartX = e.touches[0].clientX;
+                isTouchMove = false;
+            }, { passive: true });
+
+            card.addEventListener('touchmove', (e) => {
+                const deltaY = Math.abs(e.touches[0].clientY - touchStartY);
+                const deltaX = Math.abs(e.touches[0].clientX - touchStartX);
+                // Si se mueve más de 10px, es un scroll no un tap
+                if (deltaY > 10 || deltaX > 10) {
+                    isTouchMove = true;
+                }
+            }, { passive: true });
+
+            card.addEventListener('touchend', (e) => {
+                if (!isTouchMove) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleCardExpansion(card, person);
+                }
+            }, { passive: false });
+
+            card.addEventListener('click', (e) => {
                 e.stopPropagation();
                 toggleCardExpansion(card, person);
-            };
-
-            card.addEventListener('click', handleCardClick);
-            card.addEventListener('touchend', handleCardClick, { passive: false });
+            });
 
             return card;
         }
@@ -3988,10 +4011,12 @@
             `;
 
             // Al hacer click en mini-tarjeta, buscar y expandir esa tarjeta principal
-            const handleMiniCardClick = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
+            // Diferenciar entre tap y scroll en móvil
+            let miniTouchStartY = 0;
+            let miniTouchStartX = 0;
+            let isMiniTouchMove = false;
 
+            const navigateToFamilyMember = () => {
                 // Actualizar buscador del árbol
                 const treeSearchInput = document.getElementById('treeSearchInput');
                 if (treeSearchInput) {
@@ -4014,8 +4039,33 @@
                 }, 100);
             };
 
-            miniCard.addEventListener('click', handleMiniCardClick);
-            miniCard.addEventListener('touchend', handleMiniCardClick, { passive: false });
+            miniCard.addEventListener('touchstart', (e) => {
+                miniTouchStartY = e.touches[0].clientY;
+                miniTouchStartX = e.touches[0].clientX;
+                isMiniTouchMove = false;
+            }, { passive: true });
+
+            miniCard.addEventListener('touchmove', (e) => {
+                const deltaY = Math.abs(e.touches[0].clientY - miniTouchStartY);
+                const deltaX = Math.abs(e.touches[0].clientX - miniTouchStartX);
+                // Si se mueve más de 10px, es un scroll no un tap
+                if (deltaY > 10 || deltaX > 10) {
+                    isMiniTouchMove = true;
+                }
+            }, { passive: true });
+
+            miniCard.addEventListener('touchend', (e) => {
+                if (!isMiniTouchMove) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    navigateToFamilyMember();
+                }
+            }, { passive: false });
+
+            miniCard.addEventListener('click', (e) => {
+                e.stopPropagation();
+                navigateToFamilyMember();
+            });
 
             return miniCard;
         }
