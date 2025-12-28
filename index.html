@@ -862,7 +862,7 @@
 
         .tree-search-input {
             width: 100%;
-            padding: 10px 12px 10px 40px;
+            padding: 10px 45px 10px 40px;
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 25px;
             background: rgba(255, 255, 255, 0.15);
@@ -881,6 +881,37 @@
             background: rgba(255, 255, 255, 0.25);
             border-color: white;
             box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        .tree-search-clear {
+            position: absolute;
+            right: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 2;
+        }
+
+        .tree-search-clear:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .tree-search-clear:active {
+            transform: scale(0.95);
+        }
+
+        .tree-search-clear.show {
+            display: flex;
         }
 
         .family-tree-close {
@@ -2019,6 +2050,7 @@
                     <div class="tree-search-container">
                         <span class="search-icon">🔍</span>
                         <input type="text" id="treeSearchInput" class="tree-search-input" placeholder="Buscar persona...">
+                        <button class="tree-search-clear" id="treeSearchClear" title="Netejar cerca">✕</button>
                     </div>
                     <button class="family-tree-close" onclick="closeFamilyTree()" title="Tancar (ESC)">
                         ✕
@@ -3153,13 +3185,14 @@
         let searchBlurTimeout;
         function setupTreeSearch() {
             const treeSearchInput = document.getElementById('treeSearchInput');
+            const treeSearchClear = document.getElementById('treeSearchClear');
             if (!treeSearchInput) return;
 
             // Solo agregar el event listener una vez
             if (treeSearchListenerAdded) return;
 
-            treeSearchInput.addEventListener('input', function(e) {
-                const searchTerm = e.target.value.toLowerCase().trim();
+            // Función para filtrar tarjetas
+            const filterCards = (searchTerm) => {
                 const cards = document.querySelectorAll('.family-list-card');
 
                 if (!searchTerm) {
@@ -3167,7 +3200,16 @@
                     cards.forEach(card => {
                         card.style.display = 'flex';
                     });
+                    // Ocultar botón de limpiar
+                    if (treeSearchClear) {
+                        treeSearchClear.classList.remove('show');
+                    }
                     return;
+                }
+
+                // Mostrar botón de limpiar
+                if (treeSearchClear) {
+                    treeSearchClear.classList.add('show');
                 }
 
                 // Filtrar tarjetas por nombre
@@ -3182,6 +3224,11 @@
                         }
                     }
                 });
+            };
+
+            treeSearchInput.addEventListener('input', function(e) {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                filterCards(searchTerm);
 
                 // Cerrar teclado automáticamente después de buscar (móvil/tablet)
                 clearTimeout(searchBlurTimeout);
@@ -3191,6 +3238,15 @@
                     }
                 }, 800); // Esperar 800ms después de dejar de escribir
             });
+
+            // Botón de limpiar búsqueda
+            if (treeSearchClear) {
+                treeSearchClear.addEventListener('click', function() {
+                    treeSearchInput.value = '';
+                    filterCards('');
+                    treeSearchInput.focus();
+                });
+            }
 
             treeSearchListenerAdded = true;
         }
