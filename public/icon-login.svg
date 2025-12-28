@@ -10,11 +10,24 @@
   <!-- Fondo que rellena todo -->
   <rect width="512" height="512" fill="url(#gradLogin)"/>
 
-  <!-- Corazón grande que rellena casi todo el espacio -->
-  <path d="M256,456 C256,456 72,332 72,196 C72,136 116,92 176,92 C216,92 246,112 256,142 C266,112 296,92 336,92 C396,92 440,136 440,196 C440,332 256,456 256,456 Z"
-        fill="#fff"
-        opacity="0.95"
-        transform="translate(0, -70) scale(1.0)"/>
+  <!-- Regalo (gift box) -->
+  <!-- Caja principal -->
+  <rect x="120" y="200" width="272" height="200" fill="#fff" opacity="0.95" rx="10"/>
+
+  <!-- Lazo horizontal -->
+  <rect x="120" y="270" width="272" height="40" fill="#ffd700" opacity="0.9"/>
+
+  <!-- Lazo vertical -->
+  <rect x="236" y="200" width="40" height="200" fill="#ffd700" opacity="0.9"/>
+
+  <!-- Tapa del regalo -->
+  <rect x="100" y="160" width="312" height="50" fill="#fff" opacity="0.95" rx="8"/>
+  <rect x="100" y="170" width="312" height="25" fill="#ffd700" opacity="0.9"/>
+
+  <!-- Moño decorativo arriba -->
+  <ellipse cx="200" cy="150" rx="35" ry="25" fill="#ffd700" opacity="0.9"/>
+  <ellipse cx="312" cy="150" rx="35" ry="25" fill="#ffd700" opacity="0.9"/>
+  <circle cx="256" cy="135" r="18" fill="#ffd700" opacity="0.9"/>
 
   <!-- Texto abajo -->
   <text x="256" y="475" font-family="Arial, sans-serif" font-size="48" fill="#fff" text-anchor="middle" font-weight="bold">
