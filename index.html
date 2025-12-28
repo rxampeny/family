@@ -5146,8 +5146,18 @@
                 // Re-renderizar árbol si el modal está abierto
                 const treeModal = document.getElementById('familyTreeModal');
                 if (treeModal && treeModal.classList.contains('show')) {
+                    // Preservar valor del buscador antes de re-renderizar
+                    const treeSearchInput = document.getElementById('treeSearchInput');
+                    const searchValue = treeSearchInput ? treeSearchInput.value : '';
+
                     renderFamilyList();
                     setupTreeSearch();
+
+                    // Restaurar valor del buscador y re-aplicar filtro
+                    if (searchValue && treeSearchInput) {
+                        treeSearchInput.value = searchValue;
+                        treeSearchInput.dispatchEvent(new Event('input'));
+                    }
                 }
             }, 300); // Debounce 300ms
         });
