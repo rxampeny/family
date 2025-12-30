@@ -4045,7 +4045,12 @@
                 const pareja = dadesAniversaris.find(p => p.rowNumber === person.parellaId);
                 if (pareja) {
                     hasRelations = true;
-                    const relationTitle = person.estatRelacio === 'Pasada' ? 'Parella (Passada)' : 'Parella';
+                    let relationTitle = 'Parella';
+                    if (person.estatRelacio === 'Actual') {
+                        relationTitle = 'Parella (Actual)';
+                    } else if (person.estatRelacio === 'Pasada') {
+                        relationTitle = 'Parella (Passada)';
+                    }
                     panel.appendChild(createRelationSection(relationTitle, [pareja]));
                 }
             }
@@ -4393,9 +4398,11 @@
                 const parella = dadesAniversaris.find(p => p.rowNumber === persona.parellaId);
                 if (parella) {
                     const icon = parella.genere === 'H' ? '👨' : '👩';
+                    const statusText = persona.estatRelacio === 'Actual' ? ' (Actual)' :
+                                      persona.estatRelacio === 'Pasada' ? ' (Passada)' : '';
                     const statusBadge = persona.estatRelacio === 'Actual' ? ' 💚' :
                                        persona.estatRelacio === 'Pasada' ? ' 🤝' : '';
-                    html += `<div style="margin-top: 8px;">${icon} Parella: ${parella.nom}${statusBadge}</div>`;
+                    html += `<div style="margin-top: 8px;">${icon} Parella${statusText}: ${parella.nom}${statusBadge}</div>`;
                     hasRelations = true;
                 }
             }
