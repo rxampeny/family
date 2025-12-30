@@ -2224,6 +2224,18 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="formEstatRelacio">Estat de la relació</label>
+                        <select id="formEstatRelacio">
+                            <option value="">No especificat</option>
+                            <option value="Actual">Actual</option>
+                            <option value="Pasada">Pasada (amb fills)</option>
+                        </select>
+                        <small style="color: #6c757d; font-size: 0.85rem; display: block; margin-top: 5px;">
+                            Indica si és la parella actual o una relació passada
+                        </small>
+                    </div>
+
+                    <div class="form-group">
                         <label for="formUrlFoto">Foto (URL)</label>
                         <input type="url" id="formUrlFoto" placeholder="https://exemple.com/foto.jpg">
                         <small style="color: #6c757d; font-size: 0.85rem; display: block; margin-top: 5px;">
@@ -4034,7 +4046,8 @@
                 const pareja = dadesAniversaris.find(p => p.rowNumber === person.parellaId);
                 if (pareja) {
                     hasRelations = true;
-                    panel.appendChild(createRelationSection('Parella', [pareja]));
+                    const relationTitle = person.estatRelacio === 'Pasada' ? 'Parella (Pasada)' : 'Parella';
+                    panel.appendChild(createRelationSection(relationTitle, [pareja]));
                 }
             }
 
@@ -4381,7 +4394,9 @@
                 const parella = dadesAniversaris.find(p => p.rowNumber === persona.parellaId);
                 if (parella) {
                     const icon = parella.genere === 'H' ? '👨' : '👩';
-                    html += `<div style="margin-top: 8px;">${icon} Parella: ${parella.nom}</div>`;
+                    const statusBadge = persona.estatRelacio === 'Actual' ? ' 💚' :
+                                       persona.estatRelacio === 'Pasada' ? ' 🤝' : '';
+                    html += `<div style="margin-top: 8px;">${icon} Parella: ${parella.nom}${statusBadge}</div>`;
                     hasRelations = true;
                 }
             }
@@ -4783,6 +4798,7 @@
             document.getElementById('formPare').value = currentEditingPerson.pareId || '';
             document.getElementById('formMare').value = currentEditingPerson.mareId || '';
             document.getElementById('formParella').value = currentEditingPerson.parellaId || '';
+            document.getElementById('formEstatRelacio').value = currentEditingPerson.estatRelacio || '';
             document.getElementById('formUrlFoto').value = currentEditingPerson.urlFoto || '';
 
             document.getElementById('deleteBtn').classList.remove('hidden');
@@ -4863,6 +4879,7 @@
             const mareId = document.getElementById('formMare').value ? parseInt(document.getElementById('formMare').value) : null;
             const parellaId = document.getElementById('formParella').value ? parseInt(document.getElementById('formParella').value) : null;
             const urlFoto = document.getElementById('formUrlFoto').value.trim();
+            const estatRelacio = document.getElementById('formEstatRelacio')?.value || '';
 
             // Validar relaciones circulares
             if (pareId && mareId && pareId === mareId) {
@@ -4931,7 +4948,7 @@
             const isEditing = currentEditingIndex >= 0;
             const oldBirthday = isEditing ? { ...dadesAniversaris[currentEditingIndex] } : null; // Deep copy para preservar rowNumber
 
-            const newBirthday = { nom, dia, mes, anyNaixement, telefon, email, genere, viu, pareId, mareId, parellaId, urlFoto };
+            const newBirthday = { nom, dia, mes, anyNaixement, telefon, email, genere, viu, pareId, mareId, parellaId, urlFoto, estatRelacio };
 
             // Si está editando, preservar rowNumber del dato antiguo
             if (isEditing && oldBirthday && oldBirthday.rowNumber) {
