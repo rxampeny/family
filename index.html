@@ -2228,7 +2228,7 @@
                         <select id="formEstatRelacio">
                             <option value="">No especificat</option>
                             <option value="Actual">Actual</option>
-                            <option value="Pasada">Pasada (amb fills)</option>
+                            <option value="Pasada">Passada (amb fills)</option>
                         </select>
                         <small style="color: #6c757d; font-size: 0.85rem; display: block; margin-top: 5px;">
                             Indica si és la parella actual o una relació passada
@@ -4046,7 +4046,7 @@
                 const pareja = dadesAniversaris.find(p => p.rowNumber === person.parellaId);
                 if (pareja) {
                     hasRelations = true;
-                    const relationTitle = person.estatRelacio === 'Pasada' ? 'Parella (Pasada)' : 'Parella';
+                    const relationTitle = person.estatRelacio === 'Pasada' ? 'Parella (Passada)' : 'Parella';
                     panel.appendChild(createRelationSection(relationTitle, [pareja]));
                 }
             }
@@ -5362,3 +5362,4 @@
     </script>
 </body>
 </html>
+
