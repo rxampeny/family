@@ -3133,10 +3133,9 @@
             // Mostrar edad si existe anyNaixement
             const ageContainer = document.getElementById('detailsAgeContainer');
             if (persona.anyNaixement) {
-                const nextBirthdayYear = birthdayDate.getFullYear();
-                const age = nextBirthdayYear - persona.anyNaixement;
-                const currentAge = today > birthdayThisYear ? age : age - 1;
-                document.getElementById('detailsAge').textContent = `${currentAge} anys (farà ${age} anys)`;
+                // Calcular edad actual correctamente
+                const currentAge = currentYear - persona.anyNaixement - (today < birthdayThisYear ? 1 : 0);
+                document.getElementById('detailsAge').textContent = `${currentAge} anys`;
                 ageContainer.style.display = 'block';
             } else {
                 ageContainer.style.display = 'none';
