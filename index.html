@@ -3871,11 +3871,25 @@
                 .attr('dy', '5em')
                 .text(d => {
                     if (d.data.viu === 'No') {
-                        return `(${d.data.anyNaixement} - ?)`;
+                        // Mostrar año de muerte si existe, sino "?"
+                        const anyMort = d.data.anyMort || '?';
+                        return `(${d.data.anyNaixement} 🕊️ - ${anyMort} ✝)`;
                     }
                     const age = new Date().getFullYear() - d.data.anyNaixement;
                     return `(${age} anys)`;
                 });
+
+            // Lugar de nacimiento (NUEVO: Solo si existe, debajo de los años)
+            nodes.filter(d => {
+                const isVerySmall = width < 500;
+                return !d.data.virtual && !d.data.isCoupleUnion && d.data.llocNaixement && !isVerySmall;
+            })
+                .append('text')
+                .attr('class', 'tree-node-subtext')
+                .attr('dy', '6.5em')
+                .style('font-size', '0.85em')
+                .style('opacity', '0.8')
+                .text(d => `📍 ${d.data.llocNaixement}`);
 
             // Centrar vista inicial con zoom responsive (más alejado en móvil pequeño)
             const initialScale = width < 500 ? 0.25 : (isMobile ? 0.35 : (isTablet ? 0.6 : 0.8));
@@ -4015,6 +4029,7 @@
                     <div class="family-list-details">
                         ${person.viu === 'No' ? '🕊️' : '🎂'} ${birthday}${ageInfo ? ' • ' + ageInfo : ''}
                     </div>
+                    ${person.llocNaixement ? `<div class="family-list-details" style="opacity: 0.8; font-size: 0.9em;">📍 ${person.llocNaixement}</div>` : ''}
                 </div>
             `;
 
