@@ -3115,18 +3115,18 @@
 
         /**
          * Formatear display de cumpleaños según estado viu
-         * Para fallecidos: solo años (nacimiento-muerte) o nacimiento + paloma
+         * Para fallecidos: años con paloma (nacimiento) y cruz (muerte)
          * Para vivos: fecha completa
          */
         function formatBirthdayDisplay(person) {
             if (person.viu === 'No') {
                 // Fallecido - solo años
                 if (person.anyMort) {
-                    return `${person.anyNaixement || '?'} - ${person.anyMort} 🕊️`;
+                    return `${person.anyNaixement || '?'} 🕊️ - ${person.anyMort} ✝`;
                 } else if (person.anyNaixement) {
                     return `${person.anyNaixement} 🕊️`;
                 } else {
-                    return '🕊️';
+                    return '✝';
                 }
             } else {
                 // Vivo - fecha completa
