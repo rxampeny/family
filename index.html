@@ -2196,6 +2196,22 @@
                     </select>
                 </div>
 
+                <div class="form-group">
+                    <label for="formLlocNaixement">Lloc de naixement</label>
+                    <input type="text" id="formLlocNaixement" placeholder="Població o país">
+                    <small style="color: #6c757d; font-size: 0.85rem; display: block; margin-top: 5px;">
+                        Opcional: on va néixer aquesta persona
+                    </small>
+                </div>
+
+                <div class="form-group" id="formAnyMortContainer" style="display: none;">
+                    <label for="formAnyMort">Any de mort</label>
+                    <input type="number" id="formAnyMort" min="1900" max="2100" placeholder="Ex: 2020">
+                    <small style="color: #6c757d; font-size: 0.85rem; display: block; margin-top: 5px;">
+                        Si la persona ha mort, indica l'any
+                    </small>
+                </div>
+
                 <!-- Sección de relaciones familiares -->
                 <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #e0e0e0;">
                     <div style="font-weight: 600; color: #667eea; margin-bottom: 15px; font-size: 1.05rem;">
@@ -3097,6 +3113,30 @@
         let filteredData = [];
         let currentSearchTerm = '';
 
+        /**
+         * Formatear display de cumpleaños según estado viu
+         * Para fallecidos: solo años (nacimiento-muerte) o nacimiento + paloma
+         * Para vivos: fecha completa
+         */
+        function formatBirthdayDisplay(person) {
+            if (person.viu === 'No') {
+                // Fallecido - solo años
+                if (person.anyMort) {
+                    return `${person.anyNaixement || '?'} - ${person.anyMort} 🕊️`;
+                } else if (person.anyNaixement) {
+                    return `${person.anyNaixement} 🕊️`;
+                } else {
+                    return '🕊️';
+                }
+            } else {
+                // Vivo - fecha completa
+                const birthday = person.anyNaixement
+                    ? `${person.dia}/${person.mes}/${person.anyNaixement}`
+                    : `${person.dia}/${person.mes}`;
+                return birthday;
+            }
+        }
+
         // Función de búsqueda
         function searchBirthdays(searchTerm) {
             currentSearchTerm = searchTerm.toLowerCase();
@@ -3127,18 +3167,38 @@
             // Guardar persona actual para edición
             currentEditingPerson = persona;
 
-            // Restaurar display normal
-            document.getElementById('detailsDate').parentElement.innerHTML = `<strong>📅 Data:</strong> <span id="detailsDate">${persona.dia} de ${getMesName(persona.mes)}</span>`;
+            // Display según estado viu
+            const dateDisplay = formatBirthdayDisplay(persona);
+            const dateLabel = persona.viu === 'No' ? '🕊️ Anys' : '📅 Data';
+            document.getElementById('detailsDate').parentElement.innerHTML =
+                `<strong>${dateLabel}:</strong> <span id="detailsDate">${dateDisplay}</span>`;
 
-            // Mostrar edad si existe anyNaixement
+            // Mostrar edad solo para vivos
             const ageContainer = document.getElementById('detailsAgeContainer');
-            if (persona.anyNaixement) {
-                // Calcular edad actual correctamente
+            if (persona.anyNaixement && persona.viu !== 'No') {
                 const currentAge = currentYear - persona.anyNaixement - (today < birthdayThisYear ? 1 : 0);
                 document.getElementById('detailsAge').textContent = `${currentAge} anys`;
                 ageContainer.style.display = 'block';
             } else {
                 ageContainer.style.display = 'none';
+            }
+
+            // Mostrar lugar de nacimiento si existe
+            const birthplaceContainer = ageContainer.parentElement.querySelector('.birthplace-info') || createBirthplaceElement();
+            if (persona.llocNaixement) {
+                birthplaceContainer.querySelector('span').textContent = persona.llocNaixement;
+                birthplaceContainer.style.display = 'block';
+            } else {
+                birthplaceContainer.style.display = 'none';
+            }
+
+            function createBirthplaceElement() {
+                const detailsContent = document.querySelector('.details-content');
+                const birthplaceDiv = document.createElement('div');
+                birthplaceDiv.className = 'details-info birthplace-info';
+                birthplaceDiv.innerHTML = '<strong>📍 Lloc de naixement:</strong> <span></span>';
+                ageContainer.parentElement.insertBefore(birthplaceDiv, ageContainer.nextSibling);
+                return birthplaceDiv;
             }
 
             document.getElementById('detailsPhone').parentElement.innerHTML = `<strong>📞 Telèfon:</strong> <span id="detailsPhone">${persona.telefon || 'No disponible'}</span>`;
@@ -3933,20 +3993,18 @@
                 iconContent = person.genere === 'H' ? '👨' : '👩';
             }
 
-            // Calcular edad
+            // Calcular edad (solo para vivos)
             let ageInfo = '';
-            if (person.anyNaixement) {
+            if (person.anyNaixement && person.viu !== 'No') {
                 const currentYear = new Date().getFullYear();
                 const age = currentYear - person.anyNaixement;
-                ageInfo = person.viu === 'No' ? `${person.anyNaixement} 🕊️` : `${age} anys`;
+                ageInfo = `${age} anys`;
             }
 
             const deceasedIcon = person.viu === 'No' ? ' 🕊️' : '';
 
-            // Fecha de cumpleaños con año
-            const birthday = person.anyNaixement
-                ? `${person.dia}/${person.mes}/${person.anyNaixement}`
-                : `${person.dia}/${person.mes}`;
+            // Formato de fecha según estado
+            const birthday = formatBirthdayDisplay(person);
 
             card.innerHTML = `
                 <div class="${iconClass}">
@@ -3955,7 +4013,7 @@
                 <div class="family-list-info">
                     <div class="family-list-name">${person.nom}${deceasedIcon}</div>
                     <div class="family-list-details">
-                        🎂 ${birthday}${ageInfo ? ' • ' + ageInfo : ''}
+                        ${person.viu === 'No' ? '🕊️' : '🎂'} ${birthday}${ageInfo ? ' • ' + ageInfo : ''}
                     </div>
                 </div>
             `;
@@ -4587,14 +4645,15 @@
             `;
 
             filteredData.forEach(person => {
-                const mesNom = getMesName(person.mes);
+                const dateDisplay = formatBirthdayDisplay(person);
+                const icon = person.viu === 'No' ? '🕊️' : '📅';
                 html += `
                     <div onclick='showBirthdayDetails(${JSON.stringify(person).replace(/'/g, "\\'")})'
                          style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px; border-radius: 10px; color: white; cursor: pointer; transition: transform 0.2s; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);"
                          onmouseover="this.style.transform='scale(1.02)'"
                          onmouseout="this.style.transform='scale(1)'">
                         <div style="font-weight: 600; font-size: 1rem; margin-bottom: 3px;">${person.nom}</div>
-                        <div style="opacity: 0.9; font-size: 0.85rem;">📅 ${person.dia} de ${mesNom}</div>
+                        <div style="opacity: 0.9; font-size: 0.85rem;">${icon} ${dateDisplay}</div>
                         ${person.telefon ? `<div style="opacity: 0.9; font-size: 0.85rem;">📱 ${person.telefon}</div>` : ''}
                     </div>
                 `;
@@ -4691,7 +4750,11 @@
                     html += `<div class="calendar-birthday-names">`;
                     birthdays.forEach((b, i) => {
                         if (i < 2) {
-                            html += `${b.nom.split(' ')[0]}<br>`;
+                            const displayDate = b.viu === 'No' && b.anyNaixement
+                                ? ` (${b.anyNaixement}${b.anyMort ? '-' + b.anyMort : ''})`
+                                : '';
+                            const icon = b.viu === 'No' ? ' 🕊️' : '';
+                            html += `${b.nom.split(' ')[0]}${displayDate}${icon}<br>`;
                         }
                     });
                     if (birthdays.length > 2) {
@@ -4776,6 +4839,11 @@
             document.getElementById('formParella').value = '';
             document.getElementById('formUrlFoto').value = '';
 
+            // Limpiar nuevos campos
+            document.getElementById('formLlocNaixement').value = '';
+            document.getElementById('formAnyMort').value = '';
+            document.getElementById('formAnyMortContainer').style.display = 'none';
+
             // Poblar dropdowns de relaciones
             populateFamilyDropdowns();
 
@@ -4806,6 +4874,17 @@
             document.getElementById('formParella').value = currentEditingPerson.parellaId || '';
             document.getElementById('formEstatRelacio').value = currentEditingPerson.estatRelacio || '';
             document.getElementById('formUrlFoto').value = currentEditingPerson.urlFoto || '';
+
+            // Cargar nuevos campos
+            document.getElementById('formLlocNaixement').value = currentEditingPerson.llocNaixement || '';
+            document.getElementById('formAnyMort').value = currentEditingPerson.anyMort || '';
+
+            // Mostrar anyMort si persona está fallecida
+            if (currentEditingPerson.viu === 'No') {
+                document.getElementById('formAnyMortContainer').style.display = 'block';
+            } else {
+                document.getElementById('formAnyMortContainer').style.display = 'none';
+            }
 
             document.getElementById('deleteBtn').classList.remove('hidden');
 
@@ -4887,6 +4966,10 @@
             const urlFoto = document.getElementById('formUrlFoto').value.trim();
             const estatRelacio = document.getElementById('formEstatRelacio')?.value || '';
 
+            // Capturar nuevos campos
+            const llocNaixement = document.getElementById('formLlocNaixement').value.trim();
+            const anyMort = document.getElementById('formAnyMort').value ? parseInt(document.getElementById('formAnyMort').value) : null;
+
             // Validar relaciones circulares
             if (pareId && mareId && pareId === mareId) {
                 alert('El pare i la mare no poden ser la mateixa persona');
@@ -4954,7 +5037,7 @@
             const isEditing = currentEditingIndex >= 0;
             const oldBirthday = isEditing ? { ...dadesAniversaris[currentEditingIndex] } : null; // Deep copy para preservar rowNumber
 
-            const newBirthday = { nom, dia, mes, anyNaixement, telefon, email, genere, viu, pareId, mareId, parellaId, urlFoto, estatRelacio };
+            const newBirthday = { nom, dia, mes, anyNaixement, telefon, email, genere, viu, pareId, mareId, parellaId, urlFoto, estatRelacio, llocNaixement, anyMort };
 
             // Si está editando, preservar rowNumber del dato antiguo
             if (isEditing && oldBirthday && oldBirthday.rowNumber) {
@@ -5210,6 +5293,17 @@
 
             // Event listener para toggle de tema
             document.getElementById('themeToggle').addEventListener('click', toggleDarkMode);
+
+            // Event listener para mostrar/ocultar campo anyMort
+            document.getElementById('formViu').addEventListener('change', function() {
+                const anyMortContainer = document.getElementById('formAnyMortContainer');
+                if (this.value === 'No') {
+                    anyMortContainer.style.display = 'block';
+                } else {
+                    anyMortContainer.style.display = 'none';
+                    document.getElementById('formAnyMort').value = '';
+                }
+            });
 
             // Inicializar modo oscuro si estaba activado
             if (localStorage.getItem('darkMode') === 'enabled') {
