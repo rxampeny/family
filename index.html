@@ -3122,9 +3122,9 @@
             if (person.viu === 'No') {
                 // Fallecido - solo años
                 if (person.anyMort) {
-                    return `${person.anyNaixement || '?'} 🕊️ - ${person.anyMort} ✝`;
+                    return `${person.anyNaixement || '?'} - ${person.anyMort} ✝`;
                 } else if (person.anyNaixement) {
-                    return `${person.anyNaixement} 🕊️`;
+                    return `${person.anyNaixement}`;
                 } else {
                     return '✝';
                 }
@@ -3873,7 +3873,7 @@
                     if (d.data.viu === 'No') {
                         // Mostrar año de muerte si existe, sino "?"
                         const anyMort = d.data.anyMort || '?';
-                        return `(${d.data.anyNaixement} 🕊️ - ${anyMort} ✝)`;
+                        return `(${d.data.anyNaixement} - ${anyMort} ✝)`;
                     }
                     const age = new Date().getFullYear() - d.data.anyNaixement;
                     return `(${age} anys)`;
@@ -4027,7 +4027,7 @@
                 <div class="family-list-info">
                     <div class="family-list-name">${person.nom}${deceasedIcon}</div>
                     <div class="family-list-details">
-                        ${person.viu === 'No' ? '🕊️' : '🎂'} ${birthday}${ageInfo ? ' • ' + ageInfo : ''}
+                        🎂 ${birthday}${ageInfo ? ' • ' + ageInfo : ''}
                     </div>
                     ${person.llocNaixement ? `<div class="family-list-details" style="opacity: 0.8; font-size: 0.9em;">📍 ${person.llocNaixement}</div>` : ''}
                 </div>
