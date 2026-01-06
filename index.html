@@ -3444,7 +3444,7 @@
                 const option = document.createElement('option');
                 option.value = p.rowNumber;
                 const calculatedAge = calculateAge(p);
-                const age = calculatedAge ? ` (${calculatedAge} anys)` : '';
+                const age = (p.viu !== 'No' && calculatedAge) ? ` (${calculatedAge} anys)` : '';
                 const deceased = p.viu === 'No' ? ' 🕊️' : '';
                 option.textContent = `${p.nom}${age}${deceased}`;
                 pareSelect.appendChild(option);
@@ -3455,7 +3455,7 @@
                 const option = document.createElement('option');
                 option.value = p.rowNumber;
                 const calculatedAge = calculateAge(p);
-                const age = calculatedAge ? ` (${calculatedAge} anys)` : '';
+                const age = (p.viu !== 'No' && calculatedAge) ? ` (${calculatedAge} anys)` : '';
                 const deceased = p.viu === 'No' ? ' 🕊️' : '';
                 option.textContent = `${p.nom}${age}${deceased}`;
                 mareSelect.appendChild(option);
@@ -3467,7 +3467,7 @@
                 option.value = p.rowNumber;
                 const icon = p.genere === 'H' ? '👨' : p.genere === 'D' ? '👩' : '';
                 const calculatedAge = calculateAge(p);
-                const age = calculatedAge ? ` (${calculatedAge} anys)` : '';
+                const age = (p.viu !== 'No' && calculatedAge) ? ` (${calculatedAge} anys)` : '';
                 const deceased = p.viu === 'No' ? ' 🕊️' : '';
                 option.textContent = `${icon} ${p.nom}${age}${deceased}`;
                 parellaSelect.appendChild(option);
