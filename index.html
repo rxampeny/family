@@ -3439,34 +3439,37 @@
                 .filter(p => p.rowNumber !== excludeRowNumber)
                 .sort((a, b) => a.nom.localeCompare(b.nom, 'ca'));
 
-            // Poblar Pare (solo hombres vivos)
-            allPeople.filter(p => p.genere === 'H' && p.viu === 'Sí').forEach(p => {
+            // Poblar Pare (solo hombres)
+            allPeople.filter(p => p.genere === 'H').forEach(p => {
                 const option = document.createElement('option');
                 option.value = p.rowNumber;
                 const calculatedAge = calculateAge(p);
                 const age = calculatedAge ? ` (${calculatedAge} anys)` : '';
-                option.textContent = `${p.nom}${age}`;
+                const deceased = p.viu === 'No' ? ' 🕊️' : '';
+                option.textContent = `${p.nom}${age}${deceased}`;
                 pareSelect.appendChild(option);
             });
 
-            // Poblar Mare (solo mujeres vivas)
-            allPeople.filter(p => p.genere === 'D' && p.viu === 'Sí').forEach(p => {
+            // Poblar Mare (solo mujeres)
+            allPeople.filter(p => p.genere === 'D').forEach(p => {
                 const option = document.createElement('option');
                 option.value = p.rowNumber;
                 const calculatedAge = calculateAge(p);
                 const age = calculatedAge ? ` (${calculatedAge} anys)` : '';
-                option.textContent = `${p.nom}${age}`;
+                const deceased = p.viu === 'No' ? ' 🕊️' : '';
+                option.textContent = `${p.nom}${age}${deceased}`;
                 mareSelect.appendChild(option);
             });
 
-            // Poblar Parella (solo personas vivas)
-            allPeople.filter(p => p.viu === 'Sí').forEach(p => {
+            // Poblar Parella (todos)
+            allPeople.forEach(p => {
                 const option = document.createElement('option');
                 option.value = p.rowNumber;
                 const icon = p.genere === 'H' ? '👨' : p.genere === 'D' ? '👩' : '';
                 const calculatedAge = calculateAge(p);
                 const age = calculatedAge ? ` (${calculatedAge} anys)` : '';
-                option.textContent = `${icon} ${p.nom}${age}`;
+                const deceased = p.viu === 'No' ? ' 🕊️' : '';
+                option.textContent = `${icon} ${p.nom}${age}${deceased}`;
                 parellaSelect.appendChild(option);
             });
         }
