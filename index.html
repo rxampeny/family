@@ -3137,6 +3137,18 @@
             }
         }
 
+        /**
+         * Calcular edad actual correcta
+         * Tiene en cuenta si ya ha cumplido años este año
+         */
+        function calculateAge(person) {
+            if (!person.anyNaixement) return null;
+            const today = new Date();
+            const currentYear = today.getFullYear();
+            const birthdayThisYear = new Date(currentYear, person.mes - 1, person.dia);
+            return currentYear - person.anyNaixement - (today < birthdayThisYear ? 1 : 0);
+        }
+
         // Función de búsqueda
         function searchBirthdays(searchTerm) {
             currentSearchTerm = searchTerm.toLowerCase();
@@ -3417,7 +3429,8 @@
             allPeople.filter(p => p.genere === 'H').forEach(p => {
                 const option = document.createElement('option');
                 option.value = p.rowNumber;
-                const age = p.anyNaixement ? ` (${new Date().getFullYear() - p.anyNaixement} anys)` : '';
+                const calculatedAge = calculateAge(p);
+                const age = calculatedAge ? ` (${calculatedAge} anys)` : '';
                 const deceased = p.viu === 'No' ? ' 🕊️' : '';
                 option.textContent = `${p.nom}${age}${deceased}`;
                 pareSelect.appendChild(option);
@@ -3427,7 +3440,8 @@
             allPeople.filter(p => p.genere === 'D').forEach(p => {
                 const option = document.createElement('option');
                 option.value = p.rowNumber;
-                const age = p.anyNaixement ? ` (${new Date().getFullYear() - p.anyNaixement} anys)` : '';
+                const calculatedAge = calculateAge(p);
+                const age = calculatedAge ? ` (${calculatedAge} anys)` : '';
                 const deceased = p.viu === 'No' ? ' 🕊️' : '';
                 option.textContent = `${p.nom}${age}${deceased}`;
                 mareSelect.appendChild(option);
@@ -3438,7 +3452,8 @@
                 const option = document.createElement('option');
                 option.value = p.rowNumber;
                 const icon = p.genere === 'H' ? '👨' : p.genere === 'D' ? '👩' : '';
-                const age = p.anyNaixement ? ` (${new Date().getFullYear() - p.anyNaixement} anys)` : '';
+                const calculatedAge = calculateAge(p);
+                const age = calculatedAge ? ` (${calculatedAge} anys)` : '';
                 const deceased = p.viu === 'No' ? ' 🕊️' : '';
                 option.textContent = `${icon} ${p.nom}${age}${deceased}`;
                 parellaSelect.appendChild(option);
@@ -3875,11 +3890,7 @@
                         const anyMort = d.data.anyMort || '?';
                         return `(${d.data.anyNaixement} - ${anyMort} ✝)`;
                     }
-                    // Calcular edad correctamente (restar 1 si aún no ha cumplido años este año)
-                    const today = new Date();
-                    const currentYear = today.getFullYear();
-                    const birthdayThisYear = new Date(currentYear, d.data.mes - 1, d.data.dia);
-                    const age = currentYear - d.data.anyNaixement - (today < birthdayThisYear ? 1 : 0);
+                    const age = calculateAge(d.data);
                     return `(${age} anys)`;
                 });
 
@@ -4014,8 +4025,7 @@
             // Calcular edad (solo para vivos)
             let ageInfo = '';
             if (person.anyNaixement && person.viu !== 'No') {
-                const currentYear = new Date().getFullYear();
-                const age = currentYear - person.anyNaixement;
+                const age = calculateAge(person);
                 ageInfo = `${age} anys`;
             }
 
@@ -4230,7 +4240,7 @@
 
             let ageInfo = '';
             if (person.anyNaixement) {
-                const age = new Date().getFullYear() - person.anyNaixement;
+                const age = calculateAge(person);
                 ageInfo = person.viu === 'No' ? `${person.anyNaixement}` : `${age} anys`;
             }
 
