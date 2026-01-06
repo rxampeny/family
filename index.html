@@ -3213,10 +3213,24 @@
                 return birthplaceDiv;
             }
 
-            document.getElementById('detailsPhone').parentElement.innerHTML = `<strong>📞 Telèfon:</strong> <span id="detailsPhone">${persona.telefon || 'No disponible'}</span>`;
-            document.getElementById('detailsEmail').parentElement.innerHTML = `<strong>📧 Email:</strong> <span id="detailsEmail">${persona.email || 'No disponible'}</span>`;
-            document.getElementById('detailsDays').parentElement.style.display = 'block';
-            document.getElementById('detailsDays').parentElement.innerHTML = `<strong>⏰ Dies fins al pròxim aniversari:</strong> <span id="detailsDays">${daysUntil === 0 ? 'Avui!' : daysUntil + ' dies'}</span>`;
+            // Mostrar email i telèfon només per persones vives
+            if (persona.viu !== 'No') {
+                document.getElementById('detailsPhone').parentElement.innerHTML = `<strong>📞 Telèfon:</strong> <span id="detailsPhone">${persona.telefon || 'No disponible'}</span>`;
+                document.getElementById('detailsEmail').parentElement.innerHTML = `<strong>📧 Email:</strong> <span id="detailsEmail">${persona.email || 'No disponible'}</span>`;
+                document.getElementById('detailsPhone').parentElement.style.display = 'block';
+                document.getElementById('detailsEmail').parentElement.style.display = 'block';
+            } else {
+                document.getElementById('detailsPhone').parentElement.style.display = 'none';
+                document.getElementById('detailsEmail').parentElement.style.display = 'none';
+            }
+
+            // Mostrar dies fins aniversari només per persones vives
+            if (persona.viu !== 'No') {
+                document.getElementById('detailsDays').parentElement.style.display = 'block';
+                document.getElementById('detailsDays').parentElement.innerHTML = `<strong>⏰ Dies fins al pròxim aniversari:</strong> <span id="detailsDays">${daysUntil === 0 ? 'Avui!' : daysUntil + ' dies'}</span>`;
+            } else {
+                document.getElementById('detailsDays').parentElement.style.display = 'none';
+            }
 
             document.getElementById('detailsName').textContent = persona.nom;
 
@@ -3425,37 +3439,34 @@
                 .filter(p => p.rowNumber !== excludeRowNumber)
                 .sort((a, b) => a.nom.localeCompare(b.nom, 'ca'));
 
-            // Poblar Pare (solo hombres)
-            allPeople.filter(p => p.genere === 'H').forEach(p => {
+            // Poblar Pare (solo hombres vivos)
+            allPeople.filter(p => p.genere === 'H' && p.viu === 'Sí').forEach(p => {
                 const option = document.createElement('option');
                 option.value = p.rowNumber;
                 const calculatedAge = calculateAge(p);
                 const age = calculatedAge ? ` (${calculatedAge} anys)` : '';
-                const deceased = p.viu === 'No' ? ' 🕊️' : '';
-                option.textContent = `${p.nom}${age}${deceased}`;
+                option.textContent = `${p.nom}${age}`;
                 pareSelect.appendChild(option);
             });
 
-            // Poblar Mare (solo mujeres)
-            allPeople.filter(p => p.genere === 'D').forEach(p => {
+            // Poblar Mare (solo mujeres vivas)
+            allPeople.filter(p => p.genere === 'D' && p.viu === 'Sí').forEach(p => {
                 const option = document.createElement('option');
                 option.value = p.rowNumber;
                 const calculatedAge = calculateAge(p);
                 const age = calculatedAge ? ` (${calculatedAge} anys)` : '';
-                const deceased = p.viu === 'No' ? ' 🕊️' : '';
-                option.textContent = `${p.nom}${age}${deceased}`;
+                option.textContent = `${p.nom}${age}`;
                 mareSelect.appendChild(option);
             });
 
-            // Poblar Parella (todos)
-            allPeople.forEach(p => {
+            // Poblar Parella (solo personas vivas)
+            allPeople.filter(p => p.viu === 'Sí').forEach(p => {
                 const option = document.createElement('option');
                 option.value = p.rowNumber;
                 const icon = p.genere === 'H' ? '👨' : p.genere === 'D' ? '👩' : '';
                 const calculatedAge = calculateAge(p);
                 const age = calculatedAge ? ` (${calculatedAge} anys)` : '';
-                const deceased = p.viu === 'No' ? ' 🕊️' : '';
-                option.textContent = `${icon} ${p.nom}${age}${deceased}`;
+                option.textContent = `${icon} ${p.nom}${age}`;
                 parellaSelect.appendChild(option);
             });
         }
