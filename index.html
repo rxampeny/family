@@ -3875,7 +3875,11 @@
                         const anyMort = d.data.anyMort || '?';
                         return `(${d.data.anyNaixement} - ${anyMort} ✝)`;
                     }
-                    const age = new Date().getFullYear() - d.data.anyNaixement;
+                    // Calcular edad correctamente (restar 1 si aún no ha cumplido años este año)
+                    const today = new Date();
+                    const currentYear = today.getFullYear();
+                    const birthdayThisYear = new Date(currentYear, d.data.mes - 1, d.data.dia);
+                    const age = currentYear - d.data.anyNaixement - (today < birthdayThisYear ? 1 : 0);
                     return `(${age} anys)`;
                 });
 
