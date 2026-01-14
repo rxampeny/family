@@ -5657,80 +5657,87 @@
         });
     </script>
 
-    <!-- Botó per obrir el xat -->
-    <button id="chat-toggle" type="button">💬 Assistència</button>
+  <!-- Botó per obrir el xat -->
+<button id="chat-toggle" type="button">💬 Assistència</button>
 
-    <!-- Contenidor del xat -->
-    <div id="chat-wrapper">
-        <button id="chat-close" type="button" aria-label="Tancar xat">✕</button>
-        <openai-chatkit id="chat-family"></openai-chatkit>
-    </div>
+<!-- Contenidor del xat -->
+<div id="chat-wrapper">
+  <button id="chat-close" type="button" aria-label="Tancar xat">✕</button>
+  <openai-chatkit id="chat-family"></openai-chatkit>
+</div>
 
-    <script>
-      // Toggle UI (obrir/tancar)
-      (function () {
-        const toggleBtn = document.getElementById("chat-toggle");
-        const chatWrapper = document.getElementById("chat-wrapper");
-        const closeBtn = document.getElementById("chat-close");
+<script>
+  // Toggle UI (obrir/tancar)
+  (function () {
+    const toggleBtn = document.getElementById("chat-toggle");
+    const chatWrapper = document.getElementById("chat-wrapper");
+    const closeBtn = document.getElementById("chat-close");
 
-        function openChat() {
-          chatWrapper.style.display = "block";
-          toggleBtn.style.display = "none";
-        }
-        function closeChat() {
-          chatWrapper.style.display = "none";
-          toggleBtn.style.display = "flex";
-        }
+    function openChat() {
+      chatWrapper.style.display = "block";
+      toggleBtn.style.display = "none";
+    }
+    function closeChat() {
+      chatWrapper.style.display = "none";
+      toggleBtn.style.display = "flex";
+    }
 
-        toggleBtn.addEventListener("click", openChat);
-        closeBtn.addEventListener("click", closeChat);
+    toggleBtn.addEventListener("click", openChat);
+    closeBtn.addEventListener("click", closeChat);
 
-        // (Opcional) tancar amb ESC quan el xat està obert
-        document.addEventListener("keydown", (e) => {
-          if (e.key === "Escape" && chatWrapper.style.display === "block") closeChat();
-        });
+    // (Opcional) tancar amb ESC quan el xat està obert
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && chatWrapper.style.display === "block") closeChat();
+    });
 
-        // user id persistent per navegador
-        const KEY = "chatkit_user_id";
-        let user = localStorage.getItem(KEY);
-        if (!user) {
-          user = (crypto.randomUUID ? crypto.randomUUID() : (Date.now() + "-" + Math.random()));
-          localStorage.setItem(KEY, user);
-        }
+    // user id persistent per navegador
+    const KEY = "chatkit_user_id";
+    let user = localStorage.getItem(KEY);
+    if (!user) {
+      user = (crypto.randomUUID ? crypto.randomUUID() : (Date.now() + "-" + Math.random()));
+      localStorage.setItem(KEY, user);
+    }
 
-        async function fetchClientSecret() {
-          const res = await fetch("/.netlify/functions/chatkit-session", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ user })
-          });
-          if (!res.ok) {
-            const txt = await res.text().catch(() => "");
-            throw new Error("chatkit-session failed: " + res.status + " " + txt);
+    async function fetchClientSecret() {
+      const res = await fetch("/.netlify/functions/chatkit-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user })
+      });
+      if (!res.ok) {
+        const txt = await res.text().catch(() => "");
+        throw new Error("chatkit-session failed: " + res.status + " " + txt);
+      }
+      const data = await res.json();
+      return data.client_secret;
+    }
+
+    function initChatKit() {
+      const el = document.getElementById("chat-family");
+      el.setOptions({
+        api: {
+          async getClientSecret() {
+            return await fetchClientSecret();
           }
-          const data = await res.json();
-          return data.client_secret;
+        },
+        startScreen: {
+          greeting: "Com et puc ajudar avui?"
+        },
+        composer: {
+          placeholder: "Escriu el missatge a l'AI"
         }
+      });
+    }
 
-        function initChatKit() {
-          const el = document.getElementById("chat-family");
-          el.setOptions({
-            api: {
-              async getClientSecret() {
-                return await fetchClientSecret();
-              }
-            }
-          });
-        }
+    // Espera a que el Web Component estigui registrat
+    (function boot(retries = 80) {
+      if (customElements.get("openai-chatkit")) return initChatKit();
+      if (retries <= 0) return console.error("ChatKit no ha carregat");
+      setTimeout(() => boot(retries - 1), 100);
+    })();
+  })();
+</script>
 
-        // Espera a que el Web Component estigui registrat
-        (function boot(retries = 80) {
-          if (customElements.get("openai-chatkit")) return initChatKit();
-          if (retries <= 0) return console.error("ChatKit no ha carregat");
-          setTimeout(() => boot(retries - 1), 100);
-        })();
-      })();
-    </script>
 
 </body>
 </html>
