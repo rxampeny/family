@@ -2096,15 +2096,22 @@
         }
 
         @media (max-width: 768px) {
+            #chat-toggle{
+                bottom:80px; /* Pujar per no solapar amb logout */
+            }
             #chat-wrapper{
                 bottom:0;
                 right:0;
-                width:100vw;
-                height:100vh;
+                left:0;
+                top:0;
+                width:100%;
+                height:100%;
             }
             openai-chatkit{
-                width:100vw;
-                height:100vh;
+                width:100%;
+                height:100%;
+                max-height:calc(100vh - 60px); /* Deixar espai per barra navegador */
+                max-height:calc(100dvh - 20px); /* Versió moderna */
                 border-radius:0;
             }
             #chat-close{
