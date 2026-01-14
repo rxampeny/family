@@ -2050,7 +2050,7 @@
             font-weight:700;
             cursor:pointer;
             box-shadow:0 8px 20px rgba(0,0,0,.25);
-            display:flex;
+            display:none; /* ocult fins login */
             align-items:center;
             gap:8px;
         }
@@ -2416,6 +2416,7 @@
                 localStorage.setItem('victorCatalaAuthTime', Date.now().toString());
                 document.getElementById('passwordModal').style.display = 'none';
                 document.querySelector('.mainContent').classList.remove('hidden');
+                document.getElementById('chat-toggle').style.display = 'flex';
                 initializeApp();
             } else {
                 alert('Contrassenya incorrecta. Si us plau, intenta-ho novament.');
@@ -5484,6 +5485,7 @@
             if (isSessionValid()) {
                 document.getElementById('passwordModal').style.display = 'none';
                 document.querySelector('.mainContent').classList.remove('hidden');
+                document.getElementById('chat-toggle').style.display = 'flex';
                 initializeApp();
             } else {
                 // Limpiar datos de autenticación expirados
@@ -5504,6 +5506,8 @@
                 localStorage.removeItem('victorCatalaAuthTime');
                 document.getElementById('passwordModal').style.display = 'flex';
                 document.querySelector('.mainContent').classList.add('hidden');
+                document.getElementById('chat-toggle').style.display = 'none';
+                document.getElementById('chat-wrapper').style.display = 'none';
                 document.getElementById('passwordInput').value = '';
             });
         });
@@ -5646,6 +5650,15 @@
               async getClientSecret() {
                 return await fetchClientSecret();
               }
+            },
+            labels: {
+              title: "Assistència",
+              placeholder: "Escriu un missatge...",
+              getStarted: "En què et puc ajudar avui?",
+              thinking: "Pensant...",
+              send: "Enviar",
+              inputAriaLabel: "Escriu el teu missatge",
+              error: "Hi ha hagut un error. Si us plau, torna-ho a provar."
             }
           });
         }
