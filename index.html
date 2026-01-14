@@ -5645,21 +5645,13 @@
 
         function initChatKit() {
           const el = document.getElementById("chat-family");
-       el.setOptions({
-       api: {
-      async getClientSecret() {
-       return await fetchClientSecret();
-      }
-       },
-      ui: {
-        language: "ca",
-        strings: {
-          greeting: "En què et puc ajudar avui?",
-         inputPlaceholder: "Escriu un missatge a l’assistent…"
-        }
-       }
-       });
-
+          el.setOptions({
+            api: {
+              async getClientSecret() {
+                return await fetchClientSecret();
+              }
+            }
+          });
         }
 
         // Espera a que el Web Component estigui registrat
