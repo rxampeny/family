@@ -413,23 +413,46 @@
             transform: none;
         }
 
-        /* Botón flotante para cerrar sesión en móviles */
+        /* Botones flotantes en móviles - organizados en 2 columnas */
         @media (max-width: 768px) {
+            /* COLUMNA IZQUIERDA */
+            .send-emails-btn {
+                padding: 10px 15px;
+                font-size: 0.8rem;
+                bottom: 20px;
+                left: 15px;
+            }
+
+            .send-sms-btn {
+                padding: 10px 15px;
+                font-size: 0.8rem;
+                bottom: 65px;
+                left: 15px;
+            }
+
+            /* .tree-btn ya tiene sus estilos más abajo, solo ajustamos bottom */
+
+            /* COLUMNA DERECHA */
             #logoutButton {
                 position: fixed;
                 bottom: 20px;
-                right: 20px;
+                right: 15px;
                 z-index: 100;
                 padding: 10px 15px;
                 border-radius: 30px;
+                font-size: 0.8rem;
             }
+
+            /* #chat-toggle se ajusta en su sección de estilos */
+
+            /* .add-btn ya tiene sus estilos más abajo, solo ajustamos bottom */
 
             .mainContent {
                 width: 100%;
             }
 
             .container {
-                margin-bottom: 270px;
+                margin-bottom: 200px;
                 padding: 15px;
             }
 
@@ -459,37 +482,23 @@
             body {
                 padding: 5px;
             }
-
-            .send-emails-btn {
-                padding: 10px 20px;
-                font-size: 0.85rem;
-                bottom: 210px;
-                left: 20px;
-            }
-
-            .send-sms-btn {
-                padding: 10px 20px;
-                font-size: 0.85rem;
-                bottom: 160px;
-                left: 20px;
-            }
         }
 
         @media (max-width: 400px) {
             .add-btn, .tree-btn {
-                width: 55px;
-                height: 55px;
-                font-size: 28px;
-                bottom: 75px;
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+                bottom: 100px;
             }
 
-            .send-emails-btn, .send-sms-btn {
-                padding: 8px 16px;
-                font-size: 0.75rem;
+            .send-emails-btn, .send-sms-btn, #logoutButton, #chat-toggle {
+                padding: 8px 12px;
+                font-size: 0.7rem;
             }
 
             .container {
-                margin-bottom: 280px;
+                margin-bottom: 180px;
             }
         }
 
@@ -1746,17 +1755,17 @@
 
         @media (max-width: 768px) {
             .tree-btn {
-                bottom: 80px;
+                bottom: 110px;
                 left: 15px;
-                width: 65px;
-                height: 65px;
-                font-size: 32px;
+                width: 55px;
+                height: 55px;
+                font-size: 28px;
             }
 
             .tree-btn::before {
                 font-size: 12px;
                 padding: 6px 12px;
-                left: 75px;
+                left: 65px;
             }
         }
 
@@ -1974,17 +1983,17 @@
 
         @media (max-width: 768px) {
             .add-btn {
-                bottom: 80px;
+                bottom: 110px;
                 right: 15px;
-                width: 65px;
-                height: 65px;
-                font-size: 32px;
+                width: 55px;
+                height: 55px;
+                font-size: 28px;
             }
 
             .add-btn::before {
                 font-size: 12px;
                 padding: 6px 12px;
-                right: 75px;
+                right: 65px;
             }
 
             .calendar-grid {
@@ -2097,7 +2106,10 @@
 
         @media (max-width: 768px) {
             #chat-toggle{
-                bottom:80px; /* Pujar per no solapar amb logout */
+                bottom:65px; /* Alineat amb SMS a l'esquerra */
+                right:15px;
+                padding:10px 15px;
+                font-size:0.8rem;
             }
             #chat-wrapper{
                 bottom:0;
