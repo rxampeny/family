@@ -5656,7 +5656,8 @@
             }
         });
     </script>
-<!-- Botó per obrir el xat -->
+
+  <!-- Botó per obrir el xat -->
 <button id="chat-toggle" type="button">💬 Assistència</button>
 
 <!-- Contenidor del xat -->
@@ -5719,21 +5720,11 @@
             return await fetchClientSecret();
           }
         },
-        locale: "ca",  // si la versió del widget ho suporta
-        header: {
-          title: "Gestor familiar",
-          subtitle: "Assistent d'IA per a la teva família"
-        },
         startScreen: {
-          greeting: "Com et puc ajudar avui?",
-          prompts: [
-            "Aniversaris?",
-            "Llocs?",
-            "Parelles?"
-          ]
+          greeting: "Com et puc ajudar avui?"
         },
         composer: {
-          placeholder: "Escriu el dubte respecte la família"
+          placeholder: "Escriu el missatge a l'AI"
         }
       });
     }
