@@ -2034,7 +2034,87 @@
                 font-size: 1.1rem !important;
             }
         }
+    
+        /* Chat flotant (ChatKit) */
+        #chat-toggle{
+            position:fixed;
+            bottom:20px;
+            right:20px;
+            z-index:2100;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color:#fff;
+            border:none;
+            border-radius:50px;
+            padding:14px 18px;
+            font-size:14px;
+            font-weight:700;
+            cursor:pointer;
+            box-shadow:0 8px 20px rgba(0,0,0,.25);
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
+
+        #chat-wrapper{
+            position:fixed;
+            bottom:20px;
+            right:20px;
+            z-index:2000;
+            display:none; /* ocult per defecte */
+        }
+
+        openai-chatkit{
+            width:360px;
+            height:520px;
+            background:#fff;
+            border-radius:12px;
+            box-shadow:0 10px 25px rgba(0,0,0,.25);
+            overflow:hidden;
+        }
+
+        #chat-close{
+            position:absolute;
+            top:6px;
+            right:8px;
+            z-index:2200;
+            background:rgba(255,255,255,0.85);
+            border:1px solid rgba(0,0,0,0.08);
+            width:34px;
+            height:34px;
+            border-radius:50%;
+            font-size:20px;
+            cursor:pointer;
+            color:#555;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            box-shadow:0 4px 12px rgba(0,0,0,0.12);
+        }
+
+        #chat-close:hover{
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            #chat-wrapper{
+                bottom:0;
+                right:0;
+                width:100vw;
+                height:100vh;
+            }
+            openai-chatkit{
+                width:100vw;
+                height:100vh;
+                border-radius:0;
+            }
+            #chat-close{
+                top:12px;
+                right:12px;
+            }
+        }
+
     </style>
+<script src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js" async></script>
 </head>
 <body>
     <!-- Modal de contraseña -->
@@ -5503,6 +5583,82 @@
             }
         });
     </script>
+
+    <!-- Botó per obrir el xat -->
+    <button id="chat-toggle" type="button">💬 Assistència</button>
+
+    <!-- Contenidor del xat -->
+    <div id="chat-wrapper">
+        <button id="chat-close" type="button" aria-label="Tancar xat">✕</button>
+        <openai-chatkit id="chat-family"></openai-chatkit>
+    </div>
+
+    <script>
+      // Toggle UI (obrir/tancar)
+      (function () {
+        const toggleBtn = document.getElementById("chat-toggle");
+        const chatWrapper = document.getElementById("chat-wrapper");
+        const closeBtn = document.getElementById("chat-close");
+
+        function openChat() {
+          chatWrapper.style.display = "block";
+          toggleBtn.style.display = "none";
+        }
+        function closeChat() {
+          chatWrapper.style.display = "none";
+          toggleBtn.style.display = "flex";
+        }
+
+        toggleBtn.addEventListener("click", openChat);
+        closeBtn.addEventListener("click", closeChat);
+
+        // (Opcional) tancar amb ESC quan el xat està obert
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && chatWrapper.style.display === "block") closeChat();
+        });
+
+        // user id persistent per navegador
+        const KEY = "chatkit_user_id";
+        let user = localStorage.getItem(KEY);
+        if (!user) {
+          user = (crypto.randomUUID ? crypto.randomUUID() : (Date.now() + "-" + Math.random()));
+          localStorage.setItem(KEY, user);
+        }
+
+        async function fetchClientSecret() {
+          const res = await fetch("/.netlify/functions/chatkit-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user })
+          });
+          if (!res.ok) {
+            const txt = await res.text().catch(() => "");
+            throw new Error("chatkit-session failed: " + res.status + " " + txt);
+          }
+          const data = await res.json();
+          return data.client_secret;
+        }
+
+        function initChatKit() {
+          const el = document.getElementById("chat-family");
+          el.setOptions({
+            api: {
+              async getClientSecret() {
+                return await fetchClientSecret();
+              }
+            }
+          });
+        }
+
+        // Espera a que el Web Component estigui registrat
+        (function boot(retries = 80) {
+          if (customElements.get("openai-chatkit")) return initChatKit();
+          if (retries <= 0) return console.error("ChatKit no ha carregat");
+          setTimeout(() => boot(retries - 1), 100);
+        })();
+      })();
+    </script>
+
 </body>
 </html>
 
