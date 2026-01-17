@@ -5724,21 +5724,7 @@ function initChatKit() {
       greeting: "Com et puc ajudar avui?"
     },
     composer: {
-      placeholder: "Escriu el dubte respecte la família",
-
-      // ✅ Habilitar adjuntos (icono 📎)
-      attachments: {
-        enabled: true,
-        uploadStrategy: { type: "hosted" }, // usando ChatKit alojado
-        maxCount: 10,
-        maxSize: 50 * 1024 * 1024, // 50MB en bytes
-        accept: {
-          "application/pdf": [".pdf"],
-          "image/*": [".png", ".jpg", ".jpeg", ".webp"],
-          "text/plain": [".txt"],
-          "text/csv": [".csv"]
-        }
-      }
+      placeholder: "Escriu el dubte respecte la família"
     }
   });
 }
