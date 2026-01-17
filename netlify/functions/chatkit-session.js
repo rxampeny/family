@@ -33,16 +33,13 @@ exports.handler = async (event) => {
         "Content-Type": "application/json",
         "OpenAI-Beta": "chatkit_beta=v1",
       },
-      body: JSON.stringify({ 
-        user, 
+      body: JSON.stringify({
+        user,
         workflow: { id: WORKFLOW_ID },
-        chatkit_configuration: {
-          file_upload: {
-            enabled: true,
-            max_files: 5,
-            allowed_mime_types: ["image/*", "application/pdf", "text/*", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
-          }
-        }
+
+        // 👇 ACTIVA SUBIDA DE ARCHIVOS EN EL CHAT
+     chatkit_configuration: { file_upload: { enabled: true } }
+
       }),
     });
 

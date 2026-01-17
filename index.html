@@ -5712,22 +5712,37 @@
       return data.client_secret;
     }
 
-    function initChatKit() {
-      const el = document.getElementById("chat-family");
-      el.setOptions({
-        api: {
-          async getClientSecret() {
-            return await fetchClientSecret();
-          }
-        },
-        startScreen: {
-          greeting: "Com et puc ajudar avui?"
-        },
-        composer: {
-          placeholder: "Escriu el dubte respecte la família"
+function initChatKit() {
+  const el = document.getElementById("chat-family");
+  el.setOptions({
+    api: {
+      async getClientSecret() {
+        return await fetchClientSecret();
+      }
+    },
+    startScreen: {
+      greeting: "Com et puc ajudar avui?"
+    },
+    composer: {
+      placeholder: "Escriu el dubte respecte la família",
+
+      // ✅ Habilitar adjuntos (icono 📎)
+      attachments: {
+        enabled: true,
+        uploadStrategy: { type: "hosted" }, // usando ChatKit alojado
+        maxCount: 10,
+        maxSize: 50 * 1024 * 1024, // 50MB en bytes
+        accept: {
+          "application/pdf": [".pdf"],
+          "image/*": [".png", ".jpg", ".jpeg", ".webp"],
+          "text/plain": [".txt"],
+          "text/csv": [".csv"]
         }
-      });
+      }
     }
+  });
+}
+
 
     // Espera a que el Web Component estigui registrat
     (function boot(retries = 80) {
